@@ -10,11 +10,11 @@
 | 項目 | 内容 |
 | --- | --- |
 | パッケージ | `react-router` |
-| API | Data Router（`createBrowserRouter` + `RouterProvider`） |
+| API | Data Router（`createHashRouter` + `RouterProvider`） |
 | テスト | `createMemoryRouter` |
 
-公式テンプレートはドキュメント埋め込みのため `createHashRouter` を使う。
-このリポジトリは Vite の独立アプリなので、履歴 API の `createBrowserRouter` を使う。
+公式テンプレートと同じく `createHashRouter` を使う。
+追加画面の URL は `/#/employees/new` になる。
 
 ## ルート
 
@@ -30,7 +30,7 @@
 | 定数 | パス |
 | --- | --- |
 | `appPaths.employees` | `/employees` |
-| `appPaths.employeeNew` | `/employees/new` |
+| `appPaths.employeeNew` | `/employees/new`（URL は `/#/employees/new`） |
 | `appPaths.employee(id)` | `/employees/:employeeId` |
 | `appPaths.employeeEdit(id)` | `/employees/:employeeId/edit` |
 

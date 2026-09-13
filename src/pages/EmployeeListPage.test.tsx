@@ -1,18 +1,26 @@
 import { ThemeProvider } from '@mui/material/styles';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router';
 import { describe, expect, it } from 'vitest';
+import { appPaths } from '../app-paths';
 import { employeeColumns, getEmployees } from '../data/employees';
 import { theme } from '../theme';
 import EmployeeListPage from './EmployeeListPage';
 
+function renderPage() {
+  return render(
+    <ThemeProvider theme={theme}>
+      <MemoryRouter>
+        <EmployeeListPage />
+      </MemoryRouter>
+    </ThemeProvider>,
+  );
+}
+
 describe('EmployeeListPage', () => {
   it('見出しと従業員テーブルを表示する', () => {
-    render(
-      <ThemeProvider theme={theme}>
-        <EmployeeListPage />
-      </ThemeProvider>,
-    );
+    renderPage();
 
     expect(screen.getByRole('heading', { name: 'Employees' })).toBeInTheDocument();
     expect(screen.getByRole('table', { name: 'Employees' })).toBeInTheDocument();
@@ -20,12 +28,15 @@ describe('EmployeeListPage', () => {
     expect(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Department' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Full-time' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Create' })).toHaveAttribute(
+      'href',
+      appPaths.employeeNew,
+    );
 
     for (const employee of getEmployees()) {
       expect(screen.getByRole('cell', { name: employee.name })).toBeInTheDocument();
     }
 
-    expect(screen.queryByRole('button', { name: 'Create' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Reload' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument();
@@ -33,11 +44,7 @@ describe('EmployeeListPage', () => {
 
   it('Column の選択肢は表示列と一致する', async () => {
     const user = userEvent.setup();
-    render(
-      <ThemeProvider theme={theme}>
-        <EmployeeListPage />
-      </ThemeProvider>,
-    );
+    renderPage();
 
     await user.click(screen.getByRole('combobox', { name: 'Column' }));
 
@@ -48,11 +55,7 @@ describe('EmployeeListPage', () => {
 
   it('初期列の Name で検索語を絞り込む', async () => {
     const user = userEvent.setup();
-    render(
-      <ThemeProvider theme={theme}>
-        <EmployeeListPage />
-      </ThemeProvider>,
-    );
+    renderPage();
 
     await user.type(screen.getByRole('textbox', { name: 'Search' }), 'drake');
 
@@ -63,11 +66,7 @@ describe('EmployeeListPage', () => {
 
   it('選択した列だけを検索する', async () => {
     const user = userEvent.setup();
-    render(
-      <ThemeProvider theme={theme}>
-        <EmployeeListPage />
-      </ThemeProvider>,
-    );
+    renderPage();
 
     await user.type(screen.getByRole('textbox', { name: 'Search' }), 'finance');
 
@@ -83,11 +82,7 @@ describe('EmployeeListPage', () => {
 
   it('Age を選ぶと 25 は年齢だけに当たる', async () => {
     const user = userEvent.setup();
-    render(
-      <ThemeProvider theme={theme}>
-        <EmployeeListPage />
-      </ThemeProvider>,
-    );
+    renderPage();
 
     await user.click(screen.getByRole('combobox', { name: 'Column' }));
     await user.click(screen.getByRole('option', { name: 'Age' }));

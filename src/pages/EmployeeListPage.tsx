@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -9,6 +10,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router';
+import { appPaths } from '../app-paths';
 import EmployeeTable from '../components/EmployeeTable';
 import {
   defaultSearchField,
@@ -28,9 +31,14 @@ export default function EmployeeListPage() {
   return (
     <Box>
       <Stack spacing={3}>
-        <Typography variant="h4" component="h1">
-          Employees
-        </Typography>
+        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h4" component="h1">
+            Employees
+          </Typography>
+          <Button component={Link} to={appPaths.employeeNew} variant="contained">
+            Create
+          </Button>
+        </Stack>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <FormControl size="small" sx={{ minWidth: 180 }}>
             <InputLabel id="search-column-label">Column</InputLabel>

@@ -1,7 +1,7 @@
-import { createBrowserRouter, RouterProvider } from 'react-router';
+import { createHashRouter, RouterProvider } from 'react-router';
 import { routes } from './routes';
 
-const router = createBrowserRouter(routes);
+const router = createHashRouter(routes);
 
 export default function App() {
   return <RouterProvider router={router} />;
