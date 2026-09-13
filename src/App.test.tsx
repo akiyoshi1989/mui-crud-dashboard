@@ -5,17 +5,14 @@ import App from './App';
 import { theme } from './theme';
 
 describe('App', () => {
-  it('ホームの土台タイトルとスタックを表示する', () => {
+  it('ホームで従業員テーブルを表示する', () => {
     render(
       <ThemeProvider theme={theme}>
         <App />
       </ThemeProvider>,
     );
 
-    expect(screen.getByRole('heading', { name: 'MUI CRUD Dashboard' })).toBeInTheDocument();
-    expect(
-      screen.getByText('React + Vite + MUI + Biome + React Router の土台です。'),
-    ).toBeInTheDocument();
-    expect(screen.getByText('React Router')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Employees' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
   });
 });

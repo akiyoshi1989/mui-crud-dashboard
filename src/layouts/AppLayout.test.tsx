@@ -40,6 +40,7 @@ describe('AppLayout', () => {
     await user.click(screen.getByRole('button', { name: 'サイドバーを開く' }));
     await user.click(screen.getByRole('link', { name: 'Employees' }));
 
-    expect(await screen.findByText('ページが見つかりません')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Employees' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
   });
 });
