@@ -18,6 +18,7 @@
 | Lint / Format | Biome |
 | 単体テスト | Vitest + Testing Library |
 | スキーマ / バリデーション | Zod |
+| サーバ状態 | TanStack Query (`@tanstack/react-query`) |
 
 ## 方針
 

@@ -21,5 +21,6 @@ vi.stubGlobal('fetch', mockEmployeesApi);
 
 afterEach(() => {
   resetEmployeesApi();
+  vi.stubGlobal('fetch', mockEmployeesApi);
   cleanup();
 });

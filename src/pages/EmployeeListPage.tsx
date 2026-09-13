@@ -2,6 +2,7 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
@@ -10,49 +11,28 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { appPaths } from '../app-paths';
 import EmployeeTable from '../components/EmployeeTable';
+import { useEmployees } from '../data/employee-queries';
 import {
   defaultSearchField,
   type Employee,
   employeeColumns,
   filterEmployees,
   getEmployeeColumn,
-  getEmployees,
 } from '../data/employees';
 
 export default function EmployeeListPage() {
   const [query, setQuery] = useState('');
   const [field, setField] = useState<keyof Employee>(defaultSearchField);
-  const [allEmployees, setAllEmployees] = useState<Employee[]>([]);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const { data: allEmployees = [], isError, isPending } = useEmployees();
   const column = getEmployeeColumn(field);
   const employees = useMemo(
     () => filterEmployees(allEmployees, query, column),
     [allEmployees, column, query],
   );
-
-  useEffect(() => {
-    let cancelled = false;
-
-    getEmployees()
-      .then((data) => {
-        if (!cancelled) {
-          setAllEmployees(data);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setLoadError('Failed to load employees');
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   return (
     <Box>
@@ -89,8 +69,14 @@ export default function EmployeeListPage() {
             sx={{ flexGrow: 1 }}
           />
         </Stack>
-        {loadError ? <Alert severity="error">{loadError}</Alert> : null}
-        <EmployeeTable employees={employees} />
+        {isPending ? (
+          <CircularProgress aria-label="Loading employees" />
+        ) : (
+          <>
+            {isError ? <Alert severity="error">Failed to load employees</Alert> : null}
+            <EmployeeTable employees={employees} />
+          </>
+        )}
       </Stack>
     </Box>
   );

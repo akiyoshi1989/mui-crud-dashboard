@@ -2,19 +2,22 @@ import { ThemeProvider } from '@mui/material/styles';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { appPaths } from '../app-paths';
 import { employeeColumns, employeeSeed } from '../data/employees';
+import { QueryProvider } from '../test/query-provider';
 import { theme } from '../theme';
 import EmployeeListPage from './EmployeeListPage';
 
 function renderPage() {
   return render(
-    <ThemeProvider theme={theme}>
-      <MemoryRouter>
-        <EmployeeListPage />
-      </MemoryRouter>
-    </ThemeProvider>,
+    <QueryProvider>
+      <ThemeProvider theme={theme}>
+        <MemoryRouter>
+          <EmployeeListPage />
+        </MemoryRouter>
+      </ThemeProvider>
+    </QueryProvider>,
   );
 }
 
@@ -40,6 +43,19 @@ describe('EmployeeListPage', () => {
     expect(screen.queryByRole('button', { name: 'Reload' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument();
+  });
+
+  it('読み込み中はプログレスを表示する', () => {
+    renderPage();
+
+    expect(screen.getByRole('progressbar', { name: 'Loading employees' })).toBeInTheDocument();
+  });
+
+  it('取得失敗時はエラーを表示する', async () => {
+    vi.stubGlobal('fetch', async () => new Response('error', { status: 500 }));
+    renderPage();
+
+    expect(await screen.findByText('Failed to load employees')).toBeInTheDocument();
   });
 
   it('Column の選択肢は表示列と一致する', async () => {

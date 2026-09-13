@@ -16,8 +16,8 @@ import {
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { appPaths } from '../app-paths';
+import { useCreateEmployee } from '../data/employee-queries';
 import {
-  createEmployee,
   type EmployeeFormErrors,
   employeeFormValuesFromFormData,
   employeeRoles,
@@ -26,6 +26,7 @@ import {
 
 export default function EmployeeCreatePage() {
   const navigate = useNavigate();
+  const createEmployee = useCreateEmployee();
   const [errors, setErrors] = useState<EmployeeFormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -40,7 +41,7 @@ export default function EmployeeCreatePage() {
     }
 
     try {
-      await createEmployee(values);
+      await createEmployee.mutateAsync(values);
       navigate(appPaths.employees);
     } catch {
       setSubmitError('Failed to create employee');
@@ -92,7 +93,7 @@ export default function EmployeeCreatePage() {
           </FormControl>
           <FormControlLabel control={<Checkbox name="isFullTime" />} label="Full-time" />
           <Stack direction="row" spacing={2}>
-            <Button type="submit" variant="contained">
+            <Button type="submit" variant="contained" disabled={createEmployee.isPending}>
               Create
             </Button>
             <Button

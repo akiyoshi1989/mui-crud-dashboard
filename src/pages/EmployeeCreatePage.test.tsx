@@ -5,15 +5,18 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { describe, expect, it } from 'vitest';
 import { getEmployeeFormColumns } from '../data/employees';
 import { routes } from '../routes';
+import { QueryProvider } from '../test/query-provider';
 import { theme } from '../theme';
 
 function renderCreatePage() {
   const router = createMemoryRouter(routes, { initialEntries: ['/employees/new'] });
 
   return render(
-    <ThemeProvider theme={theme}>
-      <RouterProvider router={router} />
-    </ThemeProvider>,
+    <QueryProvider>
+      <ThemeProvider theme={theme}>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </QueryProvider>,
   );
 }
 

@@ -25,7 +25,8 @@
 ## データ
 
 - 初期データは `src/data/db.json`
-- 読み書きは `src/data/employees.ts` の `getEmployees()` / `createEmployee()`（`GET` / `POST /api/employees`）
+- 読み書きは `useEmployees()` / `useCreateEmployee()`（`GET` / `POST /api/employees`）
+- 作成成功後は従業員一覧の query を invalidate する
 - `id` は JSON Server が採番する
 - フォーム項目は `employeeColumns` から `id` を除いた列とする
 
