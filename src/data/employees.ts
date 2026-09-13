@@ -28,6 +28,12 @@ export const employeeColumns: EmployeeColumn[] = [
   { field: 'isFullTime', header: 'Full-time', type: 'boolean' },
 ];
 
+export const defaultSearchField: keyof Employee = 'name';
+
+export function getEmployeeColumn(field: keyof Employee): EmployeeColumn {
+  return employeeColumns.find((column) => column.field === field) ?? employeeColumns[0];
+}
+
 export function getEmployees(): Employee[] {
   return employeesJson as Employee[];
 }
@@ -59,19 +65,13 @@ export function matchesEmployeeColumn(
   column: EmployeeColumn,
   query: string,
 ): boolean {
-  const value = formatEmployeeValue(employee, column).toLowerCase();
-
-  if (column.type === 'date') {
-    return value === query;
-  }
-
-  return value.includes(query);
+  return formatEmployeeValue(employee, column).toLowerCase().includes(query);
 }
 
 export function filterEmployees(
   employees: Employee[],
   query: string,
-  columns: EmployeeColumn[] = employeeColumns,
+  column: EmployeeColumn,
 ): Employee[] {
   const normalized = query.trim().toLowerCase();
 
@@ -79,7 +79,5 @@ export function filterEmployees(
     return employees;
   }
 
-  return employees.filter((employee) =>
-    columns.some((column) => matchesEmployeeColumn(employee, column, normalized)),
-  );
+  return employees.filter((employee) => matchesEmployeeColumn(employee, column, normalized));
 }

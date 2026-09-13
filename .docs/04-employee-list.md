@@ -41,18 +41,18 @@
 - 既知の表示名は ID / Name / Age / Join date / Department / Full-time
 - Join date は日付部分 `YYYY-MM-DD` を表示する
 - Full-time は `Yes` / `No`
-- テーブル上に `Search` 入力を置く
-- 検索は各表示列の値に対する部分一致（OR、大文字小文字を区別しない）
-- 列をまたいだ結合文字列では検索しない
-- date 列は表示値 `YYYY-MM-DD` の完全一致にする（日付断片で年齢・ID の絞り込みが壊れないようにする）
+- テーブル上に検索対象列の `Select`（`Column`）と `Search` 入力を置く
+- `Select` の選択肢は `employeeColumns` の表示名とする
+- 初期選択は Name
+- 検索は選択した列の表示値に対する部分一致（大文字小文字を区別しない）
 - 空文字のときは全件を表示する
 
 ## 受け入れ条件
 
 - `/` と `/employees` で従業員テーブルが表示される
 - JSON の全件が行として描画される
-- 検索語で行が絞り込まれる
-- `25` は年齢 25 の行だけが残り、日付断片では全件残らない
-- `employeeColumns` を増減すると表示列が変わる
+- 検索対象列を切り替えて検索できる
+- 選択列以外の値では絞り込まれない
+- `employeeColumns` を増減すると表示列と検索対象の選択肢が変わる
 - Create / Reload / 行アクションは置かない
 - `npm run lint` / `npm run test` / `npm run build` が成功する

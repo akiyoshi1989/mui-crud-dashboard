@@ -2,7 +2,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
-import { getEmployees } from '../data/employees';
+import { employeeColumns, getEmployees } from '../data/employees';
 import { theme } from '../theme';
 import EmployeeListPage from './EmployeeListPage';
 
@@ -16,6 +16,7 @@ describe('EmployeeListPage', () => {
 
     expect(screen.getByRole('heading', { name: 'Employees' })).toBeInTheDocument();
     expect(screen.getByRole('table', { name: 'Employees' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Column' })).toHaveTextContent('Name');
     expect(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Department' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Full-time' })).toBeInTheDocument();
@@ -30,7 +31,22 @@ describe('EmployeeListPage', () => {
     expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument();
   });
 
-  it('検索語で従業員を絞り込む', async () => {
+  it('Column の選択肢は表示列と一致する', async () => {
+    const user = userEvent.setup();
+    render(
+      <ThemeProvider theme={theme}>
+        <EmployeeListPage />
+      </ThemeProvider>,
+    );
+
+    await user.click(screen.getByRole('combobox', { name: 'Column' }));
+
+    for (const column of employeeColumns) {
+      expect(screen.getByRole('option', { name: column.header })).toBeInTheDocument();
+    }
+  });
+
+  it('初期列の Name で検索語を絞り込む', async () => {
     const user = userEvent.setup();
     render(
       <ThemeProvider theme={theme}>
@@ -45,7 +61,7 @@ describe('EmployeeListPage', () => {
     expect(screen.queryByRole('cell', { name: 'Cody Phillips' })).not.toBeInTheDocument();
   });
 
-  it('25 は年齢 25 の行だけが残り日付では全件残らない', async () => {
+  it('選択した列だけを検索する', async () => {
     const user = userEvent.setup();
     render(
       <ThemeProvider theme={theme}>
@@ -53,6 +69,28 @@ describe('EmployeeListPage', () => {
       </ThemeProvider>,
     );
 
+    await user.type(screen.getByRole('textbox', { name: 'Search' }), 'finance');
+
+    expect(screen.queryByRole('cell', { name: 'Edward Perry' })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('combobox', { name: 'Column' }));
+    await user.click(screen.getByRole('option', { name: 'Department' }));
+
+    expect(screen.getByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
+    expect(screen.queryByRole('cell', { name: 'Josephine Drake' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('cell', { name: 'Cody Phillips' })).not.toBeInTheDocument();
+  });
+
+  it('Age を選ぶと 25 は年齢だけに当たる', async () => {
+    const user = userEvent.setup();
+    render(
+      <ThemeProvider theme={theme}>
+        <EmployeeListPage />
+      </ThemeProvider>,
+    );
+
+    await user.click(screen.getByRole('combobox', { name: 'Column' }));
+    await user.click(screen.getByRole('option', { name: 'Age' }));
     await user.type(screen.getByRole('textbox', { name: 'Search' }), '25');
 
     expect(screen.getByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();

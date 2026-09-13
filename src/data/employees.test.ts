@@ -5,6 +5,7 @@ import {
   formatEmployeeValue,
   formatFullTime,
   formatJoinDate,
+  getEmployeeColumn,
   getEmployees,
 } from './employees';
 import employeesJson from './employees.json';
@@ -56,60 +57,66 @@ describe('employeeColumns', () => {
   });
 });
 
+describe('getEmployeeColumn', () => {
+  it('field から列定義を返す', () => {
+    expect(getEmployeeColumn('role').header).toBe('Department');
+  });
+});
+
 describe('formatEmployeeValue', () => {
   it('列タイプに応じて表示値を返す', () => {
     const [employee] = getEmployees();
-    const [idColumn, , , joinDateColumn, , fullTimeColumn] = employeeColumns;
 
-    expect(formatEmployeeValue(employee, idColumn)).toBe('1');
-    expect(formatEmployeeValue(employee, joinDateColumn)).toBe('2025-07-16');
-    expect(formatEmployeeValue(employee, fullTimeColumn)).toBe('Yes');
+    expect(formatEmployeeValue(employee, getEmployeeColumn('id'))).toBe('1');
+    expect(formatEmployeeValue(employee, getEmployeeColumn('joinDate'))).toBe('2025-07-16');
+    expect(formatEmployeeValue(employee, getEmployeeColumn('isFullTime'))).toBe('Yes');
   });
 });
 
 describe('filterEmployees', () => {
   const employees = getEmployees();
+  const nameColumn = getEmployeeColumn('name');
+  const ageColumn = getEmployeeColumn('age');
+  const roleColumn = getEmployeeColumn('role');
+  const fullTimeColumn = getEmployeeColumn('isFullTime');
+  const joinDateColumn = getEmployeeColumn('joinDate');
 
   it('空文字では全件を返す', () => {
-    expect(filterEmployees(employees, '   ')).toEqual(employees);
+    expect(filterEmployees(employees, '   ', nameColumn)).toEqual(employees);
   });
 
-  it('名前の部分一致で絞り込む', () => {
-    expect(filterEmployees(employees, 'perry').map((employee) => employee.id)).toEqual([1]);
+  it('選択した列の部分一致で絞り込む', () => {
+    expect(filterEmployees(employees, 'perry', nameColumn).map((employee) => employee.id)).toEqual([
+      1,
+    ]);
+    expect(
+      filterEmployees(employees, 'finance', roleColumn).map((employee) => employee.id),
+    ).toEqual([1]);
+    expect(filterEmployees(employees, 'no', fullTimeColumn).map((employee) => employee.id)).toEqual(
+      [2],
+    );
   });
 
-  it('部署や Full-time 表示値でも絞り込む', () => {
-    expect(filterEmployees(employees, 'finance').map((employee) => employee.id)).toEqual([1]);
-    expect(filterEmployees(employees, 'no').map((employee) => employee.id)).toEqual([2]);
+  it('選択していない列の値では絞り込まない', () => {
+    expect(filterEmployees(employees, 'finance', nameColumn)).toEqual([]);
+    expect(filterEmployees(employees, 'perry', ageColumn)).toEqual([]);
   });
 
   it('一致しないときは空配列を返す', () => {
-    expect(filterEmployees(employees, 'zzz')).toEqual([]);
+    expect(filterEmployees(employees, 'zzz', nameColumn)).toEqual([]);
   });
 
-  it('渡した列定義だけを検索対象にする', () => {
-    const nameOnly = employeeColumns.filter((column) => column.field === 'name');
-
-    expect(filterEmployees(employees, 'finance', nameOnly)).toEqual([]);
-    expect(filterEmployees(employees, 'perry', nameOnly).map((employee) => employee.id)).toEqual([
-      1,
-    ]);
+  it('25 は Age を選んだときだけ年齢に当たる', () => {
+    expect(filterEmployees(employees, '25', ageColumn).map((employee) => employee.id)).toEqual([1]);
+    expect(filterEmployees(employees, '25', nameColumn)).toEqual([]);
   });
 
-  it('列をまたいだクエリでは絞り込まない', () => {
-    expect(filterEmployees(employees, 'perry 25')).toEqual([]);
-    expect(filterEmployees(employees, 'y 2')).toEqual([]);
-  });
-
-  it('25 は年齢の部分一致だけが当たり日付では全件残らない', () => {
-    expect(filterEmployees(employees, '25').map((employee) => employee.id)).toEqual([1]);
-  });
-
-  it('日付は表示値の完全一致だけが当たる', () => {
-    expect(filterEmployees(employees, '2025-07-16').map((employee) => employee.id)).toEqual([
-      1, 2, 3,
-    ]);
-    expect(filterEmployees(employees, '2025')).toEqual([]);
-    expect(filterEmployees(employees, '16')).toEqual([]);
+  it('Join date は表示値の部分一致で絞り込む', () => {
+    expect(
+      filterEmployees(employees, '2025-07-16', joinDateColumn).map((employee) => employee.id),
+    ).toEqual([1, 2, 3]);
+    expect(
+      filterEmployees(employees, '2025', joinDateColumn).map((employee) => employee.id),
+    ).toEqual([1, 2, 3]);
   });
 });
