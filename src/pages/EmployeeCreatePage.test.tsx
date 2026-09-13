@@ -36,7 +36,7 @@ describe('EmployeeCreatePage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Create' }));
 
-    expect(screen.getByText('Name is required')).toBeInTheDocument();
+    expect(await screen.findByText('Name is required')).toBeInTheDocument();
     expect(screen.getByText('Age is required')).toBeInTheDocument();
     expect(screen.getByText('Join date is required')).toBeInTheDocument();
     expect(screen.getByText('Department is required')).toBeInTheDocument();

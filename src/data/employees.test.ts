@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   createEmployee,
   employeeColumns,
+  employeeFormDataSchema,
+  employeeFormValuesFromFormData,
+  employeeSeed,
   emptyEmployeeFormValues,
   filterEmployees,
   formatEmployeeValue,
@@ -10,15 +13,15 @@ import {
   getEmployeeColumn,
   getEmployeeFormColumns,
   getEmployees,
+  toEmployeePayload,
   validateEmployeeForm,
 } from './employees';
-import employeesJson from './employees.json';
 
 describe('getEmployees', () => {
-  it('JSON のモック従業員を返す', () => {
-    const employees = getEmployees();
+  it('API からモック従業員を返す', async () => {
+    const employees = await getEmployees();
 
-    expect(employees).toHaveLength(employeesJson.length);
+    expect(employees).toHaveLength(employeeSeed.length);
     expect(employees.map((employee) => employee.name)).toEqual([
       'Edward Perry',
       'Josephine Drake',
@@ -69,7 +72,7 @@ describe('getEmployeeColumn', () => {
 
 describe('formatEmployeeValue', () => {
   it('列タイプに応じて表示値を返す', () => {
-    const [employee] = getEmployees();
+    const [employee] = employeeSeed;
 
     expect(formatEmployeeValue(employee, getEmployeeColumn('id'))).toBe('1');
     expect(formatEmployeeValue(employee, getEmployeeColumn('joinDate'))).toBe('2025-07-16');
@@ -78,7 +81,7 @@ describe('formatEmployeeValue', () => {
 });
 
 describe('filterEmployees', () => {
-  const employees = getEmployees();
+  const employees = employeeSeed;
   const nameColumn = getEmployeeColumn('name');
   const ageColumn = getEmployeeColumn('age');
   const roleColumn = getEmployeeColumn('role');
@@ -172,9 +175,67 @@ describe('validateEmployeeForm', () => {
   });
 });
 
+describe('employeeFormDataSchema', () => {
+  it('欠けた項目は空のフォーム値にする', () => {
+    expect(employeeFormDataSchema.parse({})).toEqual(emptyEmployeeFormValues);
+  });
+});
+
+describe('employeeFormValuesFromFormData', () => {
+  it('FormData からフォーム値を作る', () => {
+    const formData = new FormData();
+    formData.set('name', 'Ada Lovelace');
+    formData.set('age', '36');
+    formData.set('joinDate', '2026-01-15');
+    formData.set('role', 'Development');
+    formData.set('isFullTime', 'on');
+
+    expect(employeeFormValuesFromFormData(formData)).toEqual({
+      name: 'Ada Lovelace',
+      age: '36',
+      joinDate: '2026-01-15',
+      role: 'Development',
+      isFullTime: true,
+    });
+  });
+
+  it('未チェックの Full-time と未知の部署は空として扱う', () => {
+    const formData = new FormData();
+    formData.set('name', 'Ada Lovelace');
+    formData.set('age', '36');
+    formData.set('joinDate', '2026-01-15');
+    formData.set('role', 'Unknown');
+
+    expect(employeeFormValuesFromFormData(formData)).toMatchObject({
+      role: '',
+      isFullTime: false,
+    });
+  });
+});
+
+describe('toEmployeePayload', () => {
+  it('フォーム値を API 用のペイロードにする', () => {
+    expect(
+      toEmployeePayload({
+        name: ' Ada Lovelace ',
+        age: '36',
+        joinDate: '2026-01-15',
+        role: 'Development',
+        isFullTime: true,
+      }),
+    ).toEqual({
+      name: 'Ada Lovelace',
+      age: 36,
+      joinDate: '2026-01-15T00:00:00.000Z',
+      role: 'Development',
+      isFullTime: true,
+    });
+  });
+});
+
 describe('createEmployee', () => {
-  it('次の ID で従業員を追加する', () => {
-    const created = createEmployee({
+  it('API へ POST して従業員を追加する', async () => {
+    const created = await createEmployee({
       name: 'Ada Lovelace',
       age: '36',
       joinDate: '2026-01-15',
@@ -190,12 +251,13 @@ describe('createEmployee', () => {
       role: 'Development',
       isFullTime: true,
     });
-    expect(getEmployees()).toHaveLength(4);
-    expect(getEmployees()[3]).toEqual(created);
+    expect(await getEmployees()).toHaveLength(4);
   });
 
-  it('不正な入力では追加しない', () => {
-    expect(() => createEmployee(emptyEmployeeFormValues)).toThrow('Employee form is invalid');
-    expect(getEmployees()).toHaveLength(3);
+  it('不正な入力では追加しない', async () => {
+    await expect(createEmployee(emptyEmployeeFormValues)).rejects.toThrow(
+      'Employee form is invalid',
+    );
+    expect(await getEmployees()).toHaveLength(3);
   });
 });

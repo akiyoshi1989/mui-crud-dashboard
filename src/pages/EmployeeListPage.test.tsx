@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { describe, expect, it } from 'vitest';
 import { appPaths } from '../app-paths';
-import { employeeColumns, getEmployees } from '../data/employees';
+import { employeeColumns, employeeSeed } from '../data/employees';
 import { theme } from '../theme';
 import EmployeeListPage from './EmployeeListPage';
 
@@ -19,11 +19,11 @@ function renderPage() {
 }
 
 describe('EmployeeListPage', () => {
-  it('見出しと従業員テーブルを表示する', () => {
+  it('見出しと従業員テーブルを表示する', async () => {
     renderPage();
 
     expect(screen.getByRole('heading', { name: 'Employees' })).toBeInTheDocument();
-    expect(screen.getByRole('table', { name: 'Employees' })).toBeInTheDocument();
+    expect(await screen.findByRole('table', { name: 'Employees' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Column' })).toHaveTextContent('Name');
     expect(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Department' })).toBeInTheDocument();
@@ -33,8 +33,8 @@ describe('EmployeeListPage', () => {
       appPaths.employeeNew,
     );
 
-    for (const employee of getEmployees()) {
-      expect(screen.getByRole('cell', { name: employee.name })).toBeInTheDocument();
+    for (const employee of employeeSeed) {
+      expect(await screen.findByRole('cell', { name: employee.name })).toBeInTheDocument();
     }
 
     expect(screen.queryByRole('button', { name: 'Reload' })).not.toBeInTheDocument();
@@ -46,6 +46,7 @@ describe('EmployeeListPage', () => {
     const user = userEvent.setup();
     renderPage();
 
+    expect(await screen.findByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
     await user.click(screen.getByRole('combobox', { name: 'Column' }));
 
     for (const column of employeeColumns) {
@@ -57,6 +58,7 @@ describe('EmployeeListPage', () => {
     const user = userEvent.setup();
     renderPage();
 
+    expect(await screen.findByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
     await user.type(screen.getByRole('textbox', { name: 'Search' }), 'drake');
 
     expect(screen.getByRole('cell', { name: 'Josephine Drake' })).toBeInTheDocument();
@@ -68,6 +70,7 @@ describe('EmployeeListPage', () => {
     const user = userEvent.setup();
     renderPage();
 
+    expect(await screen.findByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
     await user.type(screen.getByRole('textbox', { name: 'Search' }), 'finance');
 
     expect(screen.queryByRole('cell', { name: 'Edward Perry' })).not.toBeInTheDocument();
@@ -84,6 +87,7 @@ describe('EmployeeListPage', () => {
     const user = userEvent.setup();
     renderPage();
 
+    expect(await screen.findByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
     await user.click(screen.getByRole('combobox', { name: 'Column' }));
     await user.click(screen.getByRole('option', { name: 'Age' }));
     await user.type(screen.getByRole('textbox', { name: 'Search' }), '25');

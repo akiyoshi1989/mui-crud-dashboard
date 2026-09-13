@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   FormControl,
@@ -9,7 +10,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { appPaths } from '../app-paths';
 import EmployeeTable from '../components/EmployeeTable';
@@ -25,8 +26,33 @@ import {
 export default function EmployeeListPage() {
   const [query, setQuery] = useState('');
   const [field, setField] = useState<keyof Employee>(defaultSearchField);
+  const [allEmployees, setAllEmployees] = useState<Employee[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const column = getEmployeeColumn(field);
-  const employees = useMemo(() => filterEmployees(getEmployees(), query, column), [column, query]);
+  const employees = useMemo(
+    () => filterEmployees(allEmployees, query, column),
+    [allEmployees, column, query],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getEmployees()
+      .then((data) => {
+        if (!cancelled) {
+          setAllEmployees(data);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLoadError('Failed to load employees');
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <Box>
@@ -63,6 +89,7 @@ export default function EmployeeListPage() {
             sx={{ flexGrow: 1 }}
           />
         </Stack>
+        {loadError ? <Alert severity="error">{loadError}</Alert> : null}
         <EmployeeTable employees={employees} />
       </Stack>
     </Box>

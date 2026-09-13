@@ -17,11 +17,11 @@ function renderPath(path: string) {
 }
 
 describe('routes', () => {
-  it.each(['/', '/employees'])('%s で従業員テーブルを表示する', (path) => {
+  it.each(['/', '/employees'])('%s で従業員テーブルを表示する', async (path) => {
     renderPath(path);
 
     expect(screen.getByRole('heading', { name: 'Employees' })).toBeInTheDocument();
-    expect(screen.getByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
+    expect(await screen.findByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
   });
 
   it('/employees/new で作成フォームを表示する', () => {
@@ -44,8 +44,8 @@ describe('routes', () => {
     await user.click(screen.getByRole('checkbox', { name: 'Full-time' }));
     await user.click(screen.getByRole('button', { name: 'Create' }));
 
-    expect(screen.getByRole('heading', { name: 'Employees' })).toBeInTheDocument();
-    expect(screen.getByRole('cell', { name: 'Ada Lovelace' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Employees' })).toBeInTheDocument();
+    expect(await screen.findByRole('cell', { name: 'Ada Lovelace' })).toBeInTheDocument();
     expect(screen.getAllByRole('row')).toHaveLength(5);
   });
 
@@ -57,6 +57,6 @@ describe('routes', () => {
 
     await user.click(screen.getByRole('link', { name: 'ホームへ戻る' }));
 
-    expect(screen.getByRole('heading', { name: 'Employees' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Employees' })).toBeInTheDocument();
   });
 });

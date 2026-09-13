@@ -1,7 +1,7 @@
 import { ThemeProvider } from '@mui/material/styles';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { employeeColumns, getEmployees } from '../data/employees';
+import { employeeColumns, employeeSeed } from '../data/employees';
 import { theme } from '../theme';
 import EmployeeTable from './EmployeeTable';
 
@@ -9,7 +9,7 @@ describe('EmployeeTable', () => {
   it('employeeColumns のヘッダーとセルを描画する', () => {
     render(
       <ThemeProvider theme={theme}>
-        <EmployeeTable employees={getEmployees()} />
+        <EmployeeTable employees={employeeSeed} />
       </ThemeProvider>,
     );
 
@@ -23,7 +23,7 @@ describe('EmployeeTable', () => {
 
     render(
       <ThemeProvider theme={theme}>
-        <EmployeeTable employees={getEmployees()} columns={columns} />
+        <EmployeeTable employees={employeeSeed} columns={columns} />
       </ThemeProvider>,
     );
 
