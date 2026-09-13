@@ -1,9 +1,6 @@
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import AppBar from '@mui/material/AppBar';
-import IconButton from '@mui/material/IconButton';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
+import { AppBar, IconButton, Toolbar, Typography } from '@mui/material';
 
 type DashboardHeaderProps = {
   menuOpen: boolean;
