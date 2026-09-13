@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
-import { afterEach } from 'vitest';
-import { resetEmployees } from '../data/employees';
+import { afterEach, vi } from 'vitest';
+import { mockEmployeesApi, resetEmployeesApi } from './employees-api-mock';
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -17,7 +17,9 @@ Object.defineProperty(window, 'matchMedia', {
   }),
 });
 
+vi.stubGlobal('fetch', mockEmployeesApi);
+
 afterEach(() => {
-  resetEmployees();
+  resetEmployeesApi();
   cleanup();
 });

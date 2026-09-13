@@ -23,7 +23,8 @@
 | 3 | サイドバーとヘッダー | [03-sidebar-header.md](./03-sidebar-header.md) |
 | 4 | 従業員テーブル表示 | [04-employee-list.md](./04-employee-list.md) |
 | 5 | 従業員追加 | [05-employee-create.md](./05-employee-create.md) |
-| 6 以降 | 詳細 / 編集 / 削除 | 未作成。別ブランチで進める |
+| 6 | JSON Server へのモック移行 | [06-json-server.md](./06-json-server.md) |
+| 7 以降 | 詳細 / 編集 / 削除 | 未作成。別ブランチで進める |
 
 ## 次の段階
 

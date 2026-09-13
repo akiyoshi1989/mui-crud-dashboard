@@ -5,7 +5,7 @@ import App from './App';
 import { theme } from './theme';
 
 describe('App', () => {
-  it('ホームで従業員テーブルを表示する', () => {
+  it('ホームで従業員テーブルを表示する', async () => {
     render(
       <ThemeProvider theme={theme}>
         <App />
@@ -13,6 +13,6 @@ describe('App', () => {
     );
 
     expect(screen.getByRole('heading', { name: 'Employees' })).toBeInTheDocument();
-    expect(screen.getByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
+    expect(await screen.findByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
   });
 });

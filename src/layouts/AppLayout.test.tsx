@@ -41,6 +41,6 @@ describe('AppLayout', () => {
     await user.click(screen.getByRole('link', { name: 'Employees' }));
 
     expect(await screen.findByRole('heading', { name: 'Employees' })).toBeInTheDocument();
-    expect(screen.getByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
+    expect(await screen.findByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
   });
 });

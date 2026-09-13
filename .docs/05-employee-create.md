@@ -11,7 +11,6 @@
 - 行クリックでの詳細遷移
 - Reload
 - 通知トースト
-- サーバー永続化
 
 ## パス
 
@@ -25,10 +24,9 @@
 
 ## データ
 
-- 初期データは `src/data/employees.json`
-- 読み書きは `src/data/employees.ts` の `getEmployees()` / `createEmployee()`
-- 追加結果はメモリ上に保持する（再読み込みで初期データに戻る）
-- `id` は既存最大値 + 1
+- 初期データは `src/data/db.json`
+- 読み書きは `src/data/employees.ts` の `getEmployees()` / `createEmployee()`（`GET` / `POST /api/employees`）
+- `id` は JSON Server が採番する
 - フォーム項目は `employeeColumns` から `id` を除いた列とする
 
 ## 画面
@@ -40,6 +38,7 @@
 - Department は `Market` / `Finance` / `Development`
 - Full-time はチェックボックス
 - 送信は `Create`、入力クリアは `Reset`
+- 送信値は `FormData` から読み取る（`FormEvent` は使わない）
 - 未入力・不正値は項目ごとにエラーを出す
 - 作成成功後は `/#/employees` の一覧へ戻り、追加した行が見える
 

@@ -16,8 +16,8 @@
 
 ## データ
 
-- モックは JSON ファイル `src/data/employees.json` で管理する
-- 読み出しは `src/data/employees.ts` の `getEmployees()` のみ
+- モックは JSON Server の `src/data/db.json` で管理する
+- 読み出しは `src/data/employees.ts` の `getEmployees()`（`GET /api/employees`）
 - 表示列は `src/data/employees.ts` の `employeeColumns` で一括管理する
 - データ上のキー増減への自動追随はしない
 - 公式テンプレートと同じ項目を持つ

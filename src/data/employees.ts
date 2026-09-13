@@ -1,4 +1,4 @@
-import employeesJson from './employees.json';
+import dbJson from './db.json';
 
 export type EmployeeRole = 'Market' | 'Finance' | 'Development';
 
@@ -29,6 +29,8 @@ export type EmployeeFormValues = {
 
 export type EmployeeFormErrors = Partial<Record<keyof EmployeeFormValues, string>>;
 
+export const employeesApiPath = '/api/employees';
+
 export const employeeRoles: EmployeeRole[] = ['Market', 'Finance', 'Development'];
 
 export const employeeColumns: EmployeeColumn[] = [
@@ -50,11 +52,7 @@ export const emptyEmployeeFormValues: EmployeeFormValues = {
   isFullTime: false,
 };
 
-let employees = cloneEmployees();
-
-function cloneEmployees(): Employee[] {
-  return structuredClone(employeesJson) as Employee[];
-}
+export const employeeSeed = dbJson.employees as Employee[];
 
 export function getEmployeeFormColumns(): EmployeeColumn[] {
   return employeeColumns.filter((column) => column.field !== 'id');
@@ -64,12 +62,44 @@ export function getEmployeeColumn(field: keyof Employee): EmployeeColumn {
   return employeeColumns.find((column) => column.field === field) ?? employeeColumns[0];
 }
 
-export function getEmployees(): Employee[] {
-  return employees;
+export function employeeFormValuesFromFormData(formData: FormData): EmployeeFormValues {
+  const roleValue = String(formData.get('role') ?? '');
+
+  return {
+    name: String(formData.get('name') ?? ''),
+    age: String(formData.get('age') ?? ''),
+    joinDate: String(formData.get('joinDate') ?? ''),
+    role: employeeRoles.includes(roleValue as EmployeeRole) ? (roleValue as EmployeeRole) : '',
+    isFullTime: formData.has('isFullTime'),
+  };
 }
 
-export function resetEmployees(): void {
-  employees = cloneEmployees();
+export function toEmployeePayload(values: EmployeeFormValues): Omit<Employee, 'id'> {
+  return {
+    name: values.name.trim(),
+    age: Number(values.age),
+    joinDate: `${values.joinDate}T00:00:00.000Z`,
+    role: values.role as EmployeeRole,
+    isFullTime: values.isFullTime,
+  };
+}
+
+async function parseEmployeeResponse(response: Response, failedMessage: string): Promise<Employee> {
+  if (!response.ok) {
+    throw new Error(failedMessage);
+  }
+
+  return (await response.json()) as Employee;
+}
+
+export async function getEmployees(): Promise<Employee[]> {
+  const response = await fetch(employeesApiPath);
+
+  if (!response.ok) {
+    throw new Error('Failed to load employees');
+  }
+
+  return (await response.json()) as Employee[];
 }
 
 export function formatJoinDate(isoDate: string): string {
@@ -142,23 +172,18 @@ export function validateEmployeeForm(values: EmployeeFormValues): EmployeeFormEr
   return errors;
 }
 
-export function createEmployee(values: EmployeeFormValues): Employee {
+export async function createEmployee(values: EmployeeFormValues): Promise<Employee> {
   const errors = validateEmployeeForm(values);
 
   if (Object.keys(errors).length > 0) {
     throw new Error('Employee form is invalid');
   }
 
-  const nextId = employees.reduce((max, employee) => Math.max(max, employee.id), 0) + 1;
-  const employee: Employee = {
-    id: nextId,
-    name: values.name.trim(),
-    age: Number(values.age),
-    joinDate: `${values.joinDate}T00:00:00.000Z`,
-    role: values.role as EmployeeRole,
-    isFullTime: values.isFullTime,
-  };
+  const response = await fetch(employeesApiPath, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(toEmployeePayload(values)),
+  });
 
-  employees = [...employees, employee];
-  return employee;
+  return parseEmployeeResponse(response, 'Failed to create employee');
 }

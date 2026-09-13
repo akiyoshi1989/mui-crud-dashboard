@@ -10,6 +10,7 @@
 - Biome
 - React Router
 - Vitest
+- JSON Server
 
 ## セットアップ
 
@@ -21,7 +22,8 @@ npm install
 
 | コマンド | 内容 |
 | --- | --- |
-| `npm run dev` | 開発サーバ起動 |
+| `npm run server` | JSON Server 起動（`http://localhost:3001`） |
+| `npm run dev` | 開発サーバ起動（`/api` を JSON Server へプロキシ） |
 | `npm run build` | 本番ビルド |
 | `npm run preview` | ビルド結果の確認 |
 | `npm run lint` | Biome による lint / format チェック |

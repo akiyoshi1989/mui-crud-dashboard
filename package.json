@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "json-server --watch src/data/db.json --port 3001",
     "build": "tsc -b && vite build",
     "lint": "biome check .",
     "format": "biome format --write .",
@@ -32,6 +33,7 @@
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
     "jsdom": "^30.0.1",
+    "json-server": "^0.17.4",
     "typescript": "~6.0.2",
     "vite": "^8.3.0",
     "vitest": "^5.0.0"

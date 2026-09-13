@@ -1,5 +1,5 @@
-import { useTheme } from '@mui/material/styles';
 import { Box, Toolbar, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 import { Outlet } from 'react-router';
 import DashboardHeader from './DashboardHeader';

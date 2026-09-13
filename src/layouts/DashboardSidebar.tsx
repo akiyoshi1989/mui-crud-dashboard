@@ -2,7 +2,16 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import PersonIcon from '@mui/icons-material/Person';
-import { Collapse, Drawer, List, ListItemButton, ListItemIcon, ListItemText, ListSubheader, Toolbar } from '@mui/material';
+import {
+  Collapse,
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  Toolbar,
+} from '@mui/material';
 import { type ReactNode, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import { DRAWER_WIDTH } from './layout-constants';
