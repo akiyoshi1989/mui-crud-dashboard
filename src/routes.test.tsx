@@ -24,6 +24,31 @@ describe('routes', () => {
     expect(screen.getByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
   });
 
+  it('/employees/new で作成フォームを表示する', () => {
+    renderPath('/employees/new');
+
+    expect(screen.getByRole('heading', { name: 'Create' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toBeInTheDocument();
+  });
+
+  it('従業員を追加すると一覧に表示される', async () => {
+    const user = userEvent.setup();
+    renderPath('/employees');
+
+    await user.click(screen.getByRole('link', { name: 'Create' }));
+    await user.type(screen.getByLabelText('Name'), 'Ada Lovelace');
+    await user.type(screen.getByLabelText('Age'), '36');
+    await user.type(screen.getByLabelText('Join date'), '2026-01-15');
+    await user.click(screen.getByRole('combobox', { name: 'Department' }));
+    await user.click(screen.getByRole('option', { name: 'Development' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Full-time' }));
+    await user.click(screen.getByRole('button', { name: 'Create' }));
+
+    expect(screen.getByRole('heading', { name: 'Employees' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'Ada Lovelace' })).toBeInTheDocument();
+    expect(screen.getAllByRole('row')).toHaveLength(5);
+  });
+
   it('未定義パスで404を表示しホームへ戻れる', async () => {
     const user = userEvent.setup();
     renderPath('/unknown');

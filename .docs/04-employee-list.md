@@ -8,7 +8,6 @@
 ## 対象外
 
 - Reload
-- Create
 - 行クリックでの詳細遷移
 - 編集
 - 削除
@@ -36,6 +35,7 @@
 
 - `/` と `/employees` の両方で同じ一覧を表示する（公式は `#/` と `/employees`）
 - 見出しは `Employees`
+- 見出し横に `Create` を置く（追加処理は [05-employee-create.md](./05-employee-create.md)）
 - 追加ライブラリは使わず、既存の MUI `Table` で描画する
 - テーブルと検索は `employeeColumns` を参照する
 - 既知の表示名は ID / Name / Age / Join date / Department / Full-time
@@ -54,5 +54,5 @@
 - 検索対象列を切り替えて検索できる
 - 選択列以外の値では絞り込まれない
 - `employeeColumns` を増減すると表示列と検索対象の選択肢が変わる
-- Create / Reload / 行アクションは置かない
+- Reload / 行アクションは置かない
 - `npm run lint` / `npm run test` / `npm run build` が成功する

@@ -1,12 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
+  createEmployee,
   employeeColumns,
+  emptyEmployeeFormValues,
   filterEmployees,
   formatEmployeeValue,
   formatFullTime,
   formatJoinDate,
   getEmployeeColumn,
+  getEmployeeFormColumns,
   getEmployees,
+  validateEmployeeForm,
 } from './employees';
 import employeesJson from './employees.json';
 
@@ -118,5 +122,80 @@ describe('filterEmployees', () => {
     expect(
       filterEmployees(employees, '2025', joinDateColumn).map((employee) => employee.id),
     ).toEqual([1, 2, 3]);
+  });
+});
+
+describe('getEmployeeFormColumns', () => {
+  it('id 以外の表示列をフォーム項目にする', () => {
+    expect(getEmployeeFormColumns().map((column) => column.field)).toEqual([
+      'name',
+      'age',
+      'joinDate',
+      'role',
+      'isFullTime',
+    ]);
+  });
+});
+
+describe('validateEmployeeForm', () => {
+  it('必須項目が空ならエラーを返す', () => {
+    expect(validateEmployeeForm(emptyEmployeeFormValues)).toEqual({
+      name: 'Name is required',
+      age: 'Age is required',
+      joinDate: 'Join date is required',
+      role: 'Department is required',
+    });
+  });
+
+  it('年齢が正の整数でなければエラーを返す', () => {
+    expect(
+      validateEmployeeForm({
+        ...emptyEmployeeFormValues,
+        name: 'Ada Lovelace',
+        age: '0',
+        joinDate: '2026-01-15',
+        role: 'Development',
+      }).age,
+    ).toBe('Age must be a positive number');
+  });
+
+  it('妥当な入力ではエラーなし', () => {
+    expect(
+      validateEmployeeForm({
+        name: 'Ada Lovelace',
+        age: '36',
+        joinDate: '2026-01-15',
+        role: 'Development',
+        isFullTime: true,
+      }),
+    ).toEqual({});
+  });
+});
+
+describe('createEmployee', () => {
+  it('次の ID で従業員を追加する', () => {
+    const created = createEmployee({
+      name: 'Ada Lovelace',
+      age: '36',
+      joinDate: '2026-01-15',
+      role: 'Development',
+      isFullTime: true,
+    });
+
+    expect(created).toMatchObject({
+      id: 4,
+      name: 'Ada Lovelace',
+      age: 36,
+      joinDate: '2026-01-15T00:00:00.000Z',
+      role: 'Development',
+      isFullTime: true,
+    });
+    expect(getEmployees()).toHaveLength(4);
+    expect(getEmployees()[3]).toEqual(created);
+  });
+
+  it('不正な入力では追加しない', () => {
+    expect(() => createEmployee(emptyEmployeeFormValues)).toThrow('Employee form is invalid');
+    expect(getEmployees()).toHaveLength(3);
   });
 });
