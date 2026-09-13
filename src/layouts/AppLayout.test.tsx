@@ -4,15 +4,18 @@ import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { describe, expect, it } from 'vitest';
 import { routes } from '../routes';
+import { QueryProvider } from '../test/query-provider';
 import { theme } from '../theme';
 
 function renderPath(path: string) {
   const router = createMemoryRouter(routes, { initialEntries: [path] });
 
   return render(
-    <ThemeProvider theme={theme}>
-      <RouterProvider router={router} />
-    </ThemeProvider>,
+    <QueryProvider>
+      <ThemeProvider theme={theme}>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </QueryProvider>,
   );
 }
 

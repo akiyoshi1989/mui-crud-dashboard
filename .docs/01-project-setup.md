@@ -18,6 +18,7 @@
 | Lint / Format | Biome |
 | 単体テスト | Vitest + Testing Library |
 | スキーマ / バリデーション | Zod |
+| サーバ状態 | TanStack Query (`@tanstack/react-query`) |
 
 ## 方針
 
@@ -26,6 +27,7 @@
 - MUI は `ThemeProvider` と `CssBaseline` でアプリ全体に適用する。
 - フォントは Roboto を HTML から読み込む。
 - 実装は 1 機能単位とし、機能ごとに UT を追加する。
+- フックや関数の戻り値は、使うものだけ分割代入で受け取る。オブジェクトごと受け取って毎回プロパティ参照しない。複数あるときはエイリアスで名前を分ける。
 
 ## この段階の受け入れ条件
 

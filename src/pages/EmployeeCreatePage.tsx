@@ -16,8 +16,8 @@ import {
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { appPaths } from '../app-paths';
+import { useCreateEmployee } from '../data/employee-queries';
 import {
-  createEmployee,
   type EmployeeFormErrors,
   employeeFormValuesFromFormData,
   employeeRoles,
@@ -26,10 +26,11 @@ import {
 
 export default function EmployeeCreatePage() {
   const navigate = useNavigate();
+  const { mutate, isPending } = useCreateEmployee();
   const [errors, setErrors] = useState<EmployeeFormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  async function createEmployeeAction(formData: FormData) {
+  function createEmployeeAction(formData: FormData) {
     const values = employeeFormValuesFromFormData(formData);
     const nextErrors = validateEmployeeForm(values);
     setErrors(nextErrors);
@@ -39,12 +40,14 @@ export default function EmployeeCreatePage() {
       return;
     }
 
-    try {
-      await createEmployee(values);
-      navigate(appPaths.employees);
-    } catch {
-      setSubmitError('Failed to create employee');
-    }
+    mutate(values, {
+      onSuccess: () => {
+        navigate(appPaths.employees);
+      },
+      onError: () => {
+        setSubmitError('Failed to create employee');
+      },
+    });
   }
 
   return (
@@ -92,7 +95,7 @@ export default function EmployeeCreatePage() {
           </FormControl>
           <FormControlLabel control={<Checkbox name="isFullTime" />} label="Full-time" />
           <Stack direction="row" spacing={2}>
-            <Button type="submit" variant="contained">
+            <Button type="submit" variant="contained" disabled={isPending}>
               Create
             </Button>
             <Button

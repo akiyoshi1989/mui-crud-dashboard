@@ -1,0 +1,25 @@
+---
+description: 戻り値やオブジェクトは使うものだけ分割代入で受け取る
+alwaysApply: true
+---
+
+# 必要なものだけ分割代入する
+
+フックや関数の戻り値は、オブジェクトごと受け取らず、使うプロパティだけ分割代入する。
+複数あるときは、その場でエイリアスを付けて名前を分ける。
+
+```tsx
+// ❌ BAD
+const mutation = useCreateEmployee();
+mutation.mutate(values);
+<Button disabled={mutation.isPending}>Create</Button>
+
+// ✅ GOOD
+const { mutate, isPending } = useCreateEmployee();
+mutate(values);
+<Button disabled={isPending}>Create</Button>
+
+// ✅ GOOD（複数あるとき）
+const { mutate: createUser, isPending: isCreating } = useCreateUser();
+const { mutate: deleteUser, isPending: isDeleting } = useDeleteUser();
+```
