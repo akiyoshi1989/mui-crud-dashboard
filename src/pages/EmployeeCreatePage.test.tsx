@@ -3,7 +3,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
+import { employeeApiErrorCodes } from '../data/employee-api-error';
 import { getEmployeeFormColumns } from '../data/employees';
+import { errorPageMessages } from '../errors/get-error-page-message';
 import { routes } from '../routes';
 import { mockEmployeesApi } from '../test/employees-api-mock';
 import { QueryProvider } from '../test/query-provider';
@@ -76,7 +78,9 @@ describe('EmployeeCreatePage', () => {
     await user.click(screen.getByRole('button', { name: 'Create' }));
 
     expect(
-      await screen.findByRole('heading', { name: 'Failed to create employee' }),
+      await screen.findByRole('heading', {
+        name: errorPageMessages[employeeApiErrorCodes.createEmployee],
+      }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'トップ画面へ戻る' })).toHaveAttribute('href', '/');
     expect(screen.queryByRole('heading', { name: 'Create' })).not.toBeInTheDocument();
@@ -101,7 +105,9 @@ describe('EmployeeCreatePage', () => {
     await user.click(screen.getByRole('button', { name: 'Create' }));
 
     expect(
-      await screen.findByRole('heading', { name: 'Failed to create employee' }),
+      await screen.findByRole('heading', {
+        name: errorPageMessages[employeeApiErrorCodes.createEmployee],
+      }),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole('link', { name: 'トップ画面へ戻る' }));

@@ -14,21 +14,25 @@
 
 `ErrorPage` を使う。レイアウト（ヘッダー / サイドバー）は残す。
 
-- エラーメッセージを見出しとして表示する
+- 見出しは `getErrorPageMessage()` が組み立てた表示文だけを出す
+- `Error.message` はユーザーに出さない
+- データ層は `EmployeeApiError` のコードだけを投げる
 - `トップ画面へ戻る` で `/` へ遷移する
 - 戻るときに query キャッシュをリセットし、一覧の再取得が走る
 
-| 失敗 | メッセージ |
-| --- | --- |
-| GET `/api/employees` | `Failed to load employees` |
-| POST `/api/employees` | `Failed to create employee` |
+| 失敗 | コード | 表示文 |
+| --- | --- | --- |
+| GET `/api/employees` | `load-employees` | 従業員一覧を取得できませんでした |
+| POST `/api/employees` | `create-employee` | 従業員を追加できませんでした |
+| 上記以外 | — | 処理に失敗しました |
 
 GET 失敗時は一覧（検索・テーブル）を出さない。
 POST 失敗時は作成フォームを出さない。項目エラーは従来どおりフォーム上に出す。
 
 ## 受け入れ条件
 
-- 一覧の取得失敗でエラーメッセージとトップへのリンクが出る
-- 追加の送信失敗でエラーメッセージとトップへのリンクが出る
+- 一覧の取得失敗で表示文とトップへのリンクが出る
+- 追加の送信失敗で表示文とトップへのリンクが出る
+- `Error.message` は ErrorPage に渡さない
 - リンクから `/` の一覧へ戻れる
 - `npm run lint` / `npm run test` / `npm run build` が成功する

@@ -23,6 +23,7 @@ import {
   filterEmployees,
   getEmployeeColumn,
 } from '../data/employees';
+import { getErrorPageMessage } from '../errors/get-error-page-message';
 
 export default function EmployeeListPage() {
   const [query, setQuery] = useState('');
@@ -35,9 +36,7 @@ export default function EmployeeListPage() {
   );
 
   if (isError) {
-    return (
-      <ErrorPage message={error instanceof Error ? error.message : 'Failed to load employees'} />
-    );
+    return <ErrorPage message={getErrorPageMessage(error)} />;
   }
 
   return (

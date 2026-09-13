@@ -13,13 +13,15 @@ describe('ErrorPage', () => {
       <QueryProvider>
         <ThemeProvider theme={theme}>
           <MemoryRouter>
-            <ErrorPage message="Failed to load employees" />
+            <ErrorPage message="従業員一覧を取得できませんでした" />
           </MemoryRouter>
         </ThemeProvider>
       </QueryProvider>,
     );
 
-    expect(screen.getByRole('heading', { name: 'Failed to load employees' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: '従業員一覧を取得できませんでした' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'トップ画面へ戻る' })).toHaveAttribute(
       'href',
       appPaths.home,

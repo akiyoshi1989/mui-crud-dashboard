@@ -7,9 +7,9 @@ export const employeesQuery = queryOptions({
 });
 
 export function useEmployees() {
-  const { data = [], isError, isPending } = useQuery(employeesQuery);
+  const { data = [], error, isError, isPending } = useQuery(employeesQuery);
 
-  return { data, isError, isPending };
+  return { data, error, isError, isPending };
 }
 
 export function useCreateEmployee() {

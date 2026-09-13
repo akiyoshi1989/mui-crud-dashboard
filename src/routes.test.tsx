@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
+import { employeeApiErrorCodes } from './data/employee-api-error';
+import { errorPageMessages } from './errors/get-error-page-message';
 import { routes } from './routes';
 import { mockEmployeesApi } from './test/employees-api-mock';
 import { QueryProvider } from './test/query-provider';
@@ -59,7 +61,9 @@ describe('routes', () => {
     renderPath('/');
 
     expect(
-      await screen.findByRole('heading', { name: 'Failed to load employees' }),
+      await screen.findByRole('heading', {
+        name: errorPageMessages[employeeApiErrorCodes.loadEmployees],
+      }),
     ).toBeInTheDocument();
 
     vi.stubGlobal('fetch', mockEmployeesApi);

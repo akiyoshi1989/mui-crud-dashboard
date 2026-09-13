@@ -23,6 +23,7 @@ import {
   employeeRoles,
   validateEmployeeForm,
 } from '../data/employees';
+import { getErrorPageMessage } from '../errors/get-error-page-message';
 
 export default function EmployeeCreatePage() {
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ export default function EmployeeCreatePage() {
         navigate(appPaths.employees);
       },
       onError: (cause) => {
-        setSubmitError(cause instanceof Error ? cause.message : 'Failed to create employee');
+        setSubmitError(getErrorPageMessage(cause));
       },
     });
   }

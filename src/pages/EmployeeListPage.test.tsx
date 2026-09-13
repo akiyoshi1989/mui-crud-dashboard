@@ -4,7 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
 import { appPaths } from '../app-paths';
+import { employeeApiErrorCodes } from '../data/employee-api-error';
 import { employeeColumns, employeeSeed } from '../data/employees';
+import { errorPageMessages } from '../errors/get-error-page-message';
 import { QueryProvider } from '../test/query-provider';
 import { theme } from '../theme';
 import EmployeeListPage from './EmployeeListPage';
@@ -56,7 +58,9 @@ describe('EmployeeListPage', () => {
     renderPage();
 
     expect(
-      await screen.findByRole('heading', { name: 'Failed to load employees' }),
+      await screen.findByRole('heading', {
+        name: errorPageMessages[employeeApiErrorCodes.loadEmployees],
+      }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'トップ画面へ戻る' })).toHaveAttribute('href', '/');
     expect(screen.queryByRole('table', { name: 'Employees' })).not.toBeInTheDocument();

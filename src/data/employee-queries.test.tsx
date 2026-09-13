@@ -3,6 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { createQueryClient } from '../query-client';
+import { employeeApiErrorCodes } from './employee-api-error';
 import { employeesQuery, useCreateEmployee, useEmployees } from './employee-queries';
 import { employeeSeed, getEmployees } from './employees';
 
@@ -46,8 +47,9 @@ describe('useEmployees', () => {
     const { result } = renderHook(() => useEmployees(), { wrapper: Wrapper });
 
     await waitFor(() => {
-      const { isError } = result.current;
+      const { error, isError } = result.current;
       expect(isError).toBe(true);
+      expect(error).toMatchObject({ code: employeeApiErrorCodes.loadEmployees });
     });
   });
 });
