@@ -1,5 +1,4 @@
 import {
-  Alert,
   Box,
   Button,
   Checkbox,
@@ -16,6 +15,7 @@ import {
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { appPaths } from '../app-paths';
+import ErrorPage from '../components/ErrorPage';
 import { useCreateEmployee } from '../data/employee-queries';
 import {
   type EmployeeFormErrors,
@@ -26,7 +26,7 @@ import {
 
 export default function EmployeeCreatePage() {
   const navigate = useNavigate();
-  const { mutate, isPending } = useCreateEmployee();
+  const { isPending, mutate } = useCreateEmployee();
   const [errors, setErrors] = useState<EmployeeFormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -44,10 +44,14 @@ export default function EmployeeCreatePage() {
       onSuccess: () => {
         navigate(appPaths.employees);
       },
-      onError: () => {
-        setSubmitError('Failed to create employee');
+      onError: (cause) => {
+        setSubmitError(cause instanceof Error ? cause.message : 'Failed to create employee');
       },
     });
+  }
+
+  if (submitError) {
+    return <ErrorPage message={submitError} />;
   }
 
   return (
@@ -57,7 +61,6 @@ export default function EmployeeCreatePage() {
           <Typography variant="h4" component="h1">
             Create
           </Typography>
-          {submitError ? <Alert severity="error">{submitError}</Alert> : null}
           <TextField
             name="name"
             label="Name"
@@ -98,13 +101,7 @@ export default function EmployeeCreatePage() {
             <Button type="submit" variant="contained" disabled={isPending}>
               Create
             </Button>
-            <Button
-              type="reset"
-              onClick={() => {
-                setErrors({});
-                setSubmitError(null);
-              }}
-            >
+            <Button type="reset" onClick={() => setErrors({})}>
               Reset
             </Button>
           </Stack>

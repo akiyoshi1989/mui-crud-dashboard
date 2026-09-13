@@ -2,8 +2,9 @@ import { ThemeProvider } from '@mui/material/styles';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { routes } from './routes';
+import { mockEmployeesApi } from './test/employees-api-mock';
 import { QueryProvider } from './test/query-provider';
 import { theme } from './theme';
 
@@ -50,6 +51,22 @@ describe('routes', () => {
     expect(await screen.findByRole('heading', { name: 'Employees' })).toBeInTheDocument();
     expect(await screen.findByRole('cell', { name: 'Ada Lovelace' })).toBeInTheDocument();
     expect(screen.getAllByRole('row')).toHaveLength(5);
+  });
+
+  it('一覧の取得失敗からトップへ戻れる', async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal('fetch', async () => new Response('error', { status: 500 }));
+    renderPath('/');
+
+    expect(
+      await screen.findByRole('heading', { name: 'Failed to load employees' }),
+    ).toBeInTheDocument();
+
+    vi.stubGlobal('fetch', mockEmployeesApi);
+    await user.click(screen.getByRole('link', { name: 'トップ画面へ戻る' }));
+
+    expect(await screen.findByRole('heading', { name: 'Employees' })).toBeInTheDocument();
+    expect(await screen.findByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
   });
 
   it('未定義パスで404を表示しホームへ戻れる', async () => {
