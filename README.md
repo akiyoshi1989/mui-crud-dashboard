@@ -11,6 +11,7 @@
 - React Router
 - Vitest
 - JSON Server
+- GitHub Actions
 
 ## セットアップ
 
@@ -29,6 +30,8 @@ npm install
 | `npm run lint` | Biome による lint / format チェック |
 | `npm run format` | Biome による format |
 | `npm run test` | 単体テスト |
+
+pull request と `main` への push では、GitHub Actions が `npm run lint` と `npm run test` を実行します。
 
 ## 設計
 
