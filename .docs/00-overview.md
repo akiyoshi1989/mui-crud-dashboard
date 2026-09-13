@@ -20,7 +20,8 @@
 | --- | --- | --- |
 | 1 | React + Vite + MUI + Biome の土台 | [01-project-setup.md](./01-project-setup.md) |
 | 2 | react-router 導入 | [02-routing.md](./02-routing.md) |
-| 3 以降 | レイアウト、CRUD 画面 | 未作成。別ブランチで進める |
+| 3 | サイドバーとヘッダー | [03-sidebar-header.md](./03-sidebar-header.md) |
+| 4 以降 | CRUD 画面 | 未作成。別ブランチで進める |
 
 ## 次の段階
 
