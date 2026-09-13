@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createEmployee,
   employeeColumns,
+  employeeFormDataSchema,
   employeeFormValuesFromFormData,
   employeeSeed,
   emptyEmployeeFormValues,
@@ -171,6 +172,12 @@ describe('validateEmployeeForm', () => {
         isFullTime: true,
       }),
     ).toEqual({});
+  });
+});
+
+describe('employeeFormDataSchema', () => {
+  it('欠けた項目は空のフォーム値にする', () => {
+    expect(employeeFormDataSchema.parse({})).toEqual(emptyEmployeeFormValues);
   });
 });
 

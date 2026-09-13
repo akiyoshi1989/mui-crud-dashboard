@@ -1,6 +1,9 @@
+import { z } from 'zod';
 import dbJson from './db.json';
 
-export type EmployeeRole = 'Market' | 'Finance' | 'Development';
+export const employeeRoleSchema = z.enum(['Market', 'Finance', 'Development']);
+
+export type EmployeeRole = z.infer<typeof employeeRoleSchema>;
 
 export type Employee = {
   id: number;
@@ -19,19 +22,39 @@ export type EmployeeColumn = {
   type?: EmployeeColumnType;
 };
 
-export type EmployeeFormValues = {
-  name: string;
-  age: string;
-  joinDate: string;
-  role: EmployeeRole | '';
-  isFullTime: boolean;
-};
+const formStringSchema = z.string().catch('');
 
+export const employeeFormDataSchema = z.object({
+  name: formStringSchema,
+  age: formStringSchema,
+  joinDate: formStringSchema,
+  role: formStringSchema.pipe(employeeRoleSchema.or(z.literal('')).catch('')),
+  isFullTime: z
+    .string()
+    .optional()
+    .transform((value) => value !== undefined),
+});
+
+export const employeeFormSchema = z.object({
+  name: z.string().trim().min(1, { error: 'Name is required' }),
+  age: z
+    .string()
+    .trim()
+    .min(1, { error: 'Age is required' })
+    .refine((value) => /^\d+$/.test(value) && Number(value) > 0, {
+      error: 'Age must be a positive number',
+    }),
+  joinDate: z.string().min(1, { error: 'Join date is required' }),
+  role: z.enum(employeeRoleSchema.options, { error: 'Department is required' }),
+  isFullTime: z.boolean(),
+});
+
+export type EmployeeFormValues = z.output<typeof employeeFormDataSchema>;
 export type EmployeeFormErrors = Partial<Record<keyof EmployeeFormValues, string>>;
 
 export const employeesApiPath = '/api/employees';
 
-export const employeeRoles: EmployeeRole[] = ['Market', 'Finance', 'Development'];
+export const employeeRoles = employeeRoleSchema.options;
 
 export const employeeColumns: EmployeeColumn[] = [
   { field: 'id', header: 'ID' },
@@ -44,13 +67,7 @@ export const employeeColumns: EmployeeColumn[] = [
 
 export const defaultSearchField: keyof Employee = 'name';
 
-export const emptyEmployeeFormValues: EmployeeFormValues = {
-  name: '',
-  age: '',
-  joinDate: '',
-  role: '',
-  isFullTime: false,
-};
+export const emptyEmployeeFormValues: EmployeeFormValues = employeeFormDataSchema.parse({});
 
 export const employeeSeed = dbJson.employees as Employee[];
 
@@ -63,23 +80,17 @@ export function getEmployeeColumn(field: keyof Employee): EmployeeColumn {
 }
 
 export function employeeFormValuesFromFormData(formData: FormData): EmployeeFormValues {
-  const roleValue = String(formData.get('role') ?? '');
-
-  return {
-    name: String(formData.get('name') ?? ''),
-    age: String(formData.get('age') ?? ''),
-    joinDate: String(formData.get('joinDate') ?? ''),
-    role: employeeRoles.includes(roleValue as EmployeeRole) ? (roleValue as EmployeeRole) : '',
-    isFullTime: formData.has('isFullTime'),
-  };
+  return employeeFormDataSchema.parse(Object.fromEntries(formData));
 }
 
-export function toEmployeePayload(values: EmployeeFormValues): Omit<Employee, 'id'> {
+export function toEmployeePayload(
+  values: z.output<typeof employeeFormSchema>,
+): Omit<Employee, 'id'> {
   return {
     name: values.name.trim(),
     age: Number(values.age),
     joinDate: `${values.joinDate}T00:00:00.000Z`,
-    role: values.role as EmployeeRole,
+    role: values.role,
     isFullTime: values.isFullTime,
   };
 }
@@ -149,40 +160,37 @@ export function filterEmployees(
 }
 
 export function validateEmployeeForm(values: EmployeeFormValues): EmployeeFormErrors {
+  const result = employeeFormSchema.safeParse(values);
+
+  if (result.success) {
+    return {};
+  }
+
+  const { fieldErrors } = z.flattenError(result.error);
   const errors: EmployeeFormErrors = {};
 
-  if (!values.name.trim()) {
-    errors.name = 'Name is required';
-  }
+  for (const field of employeeFormSchema.keyof().options) {
+    const message = fieldErrors[field]?.[0];
 
-  if (!values.age.trim()) {
-    errors.age = 'Age is required';
-  } else if (!/^\d+$/.test(values.age) || Number(values.age) <= 0) {
-    errors.age = 'Age must be a positive number';
-  }
-
-  if (!values.joinDate) {
-    errors.joinDate = 'Join date is required';
-  }
-
-  if (!values.role) {
-    errors.role = 'Department is required';
+    if (message) {
+      errors[field] = message;
+    }
   }
 
   return errors;
 }
 
 export async function createEmployee(values: EmployeeFormValues): Promise<Employee> {
-  const errors = validateEmployeeForm(values);
+  const parsed = employeeFormSchema.safeParse(values);
 
-  if (Object.keys(errors).length > 0) {
+  if (!parsed.success) {
     throw new Error('Employee form is invalid');
   }
 
   const response = await fetch(employeesApiPath, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(toEmployeePayload(values)),
+    body: JSON.stringify(toEmployeePayload(parsed.data)),
   });
 
   return parseEmployeeResponse(response, 'Failed to create employee');

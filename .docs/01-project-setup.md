@@ -17,6 +17,7 @@
 | アイコン | `@mui/icons-material` |
 | Lint / Format | Biome |
 | 単体テスト | Vitest + Testing Library |
+| スキーマ / バリデーション | Zod |
 
 ## 方針
 
