@@ -25,7 +25,8 @@
 | 5 | 従業員追加 | [05-employee-create.md](./05-employee-create.md) |
 | 6 | JSON Server へのモック移行 | [06-json-server.md](./06-json-server.md) |
 | 7 | TanStack Query 導入 | [07-tanstack-query.md](./07-tanstack-query.md) |
-| 8 以降 | 詳細 / 編集 / 削除 | 未作成。別ブランチで進める |
+| 8 | GitHub Actions CI | [08-github-actions-ci.md](./08-github-actions-ci.md) |
+| 9 以降 | 詳細 / 編集 / 削除 | 未作成。別ブランチで進める |
 
 ## 次の段階
 
