@@ -19,6 +19,8 @@
 
 - モックは JSON ファイル `src/data/employees.json` で管理する
 - 読み出しは `src/data/employees.ts` の `getEmployees()` のみ
+- 表示列は `src/data/employees.ts` の `employeeColumns` で一括管理する
+- データ上のキー増減への自動追随はしない
 - 公式テンプレートと同じ項目を持つ
 
 | 項目 | 型 |
@@ -35,7 +37,8 @@
 - `/` と `/employees` の両方で同じ一覧を表示する（公式は `#/` と `/employees`）
 - 見出しは `Employees`
 - 追加ライブラリは使わず、既存の MUI `Table` で描画する
-- 列は ID / Name / Age / Join date / Department / Full-time
+- テーブルと検索は `employeeColumns` を参照する
+- 既知の表示名は ID / Name / Age / Join date / Department / Full-time
 - Join date は日付部分 `YYYY-MM-DD` を表示する
 - Full-time は `Yes` / `No`
 - テーブル上に `Search` 入力を置く
@@ -47,5 +50,6 @@
 - `/` と `/employees` で従業員テーブルが表示される
 - JSON の全件が行として描画される
 - 検索語で行が絞り込まれる
+- `employeeColumns` を増減すると表示列が変わる
 - Create / Reload / 行アクションは置かない
 - `npm run lint` / `npm run test` / `npm run build` が成功する

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { filterEmployees, formatFullTime, formatJoinDate, getEmployees } from './employees';
+import {
+  employeeColumns,
+  filterEmployees,
+  formatEmployeeValue,
+  formatFullTime,
+  formatJoinDate,
+  getEmployees,
+} from './employees';
 import employeesJson from './employees.json';
 
 describe('getEmployees', () => {
@@ -28,6 +35,38 @@ describe('formatFullTime', () => {
   });
 });
 
+describe('employeeColumns', () => {
+  it('表示列を一か所で定義する', () => {
+    expect(employeeColumns.map((column) => column.field)).toEqual([
+      'id',
+      'name',
+      'age',
+      'joinDate',
+      'role',
+      'isFullTime',
+    ]);
+    expect(employeeColumns.map((column) => column.header)).toEqual([
+      'ID',
+      'Name',
+      'Age',
+      'Join date',
+      'Department',
+      'Full-time',
+    ]);
+  });
+});
+
+describe('formatEmployeeValue', () => {
+  it('列タイプに応じて表示値を返す', () => {
+    const [employee] = getEmployees();
+    const [idColumn, , , joinDateColumn, , fullTimeColumn] = employeeColumns;
+
+    expect(formatEmployeeValue(employee, idColumn)).toBe('1');
+    expect(formatEmployeeValue(employee, joinDateColumn)).toBe('2025-07-16');
+    expect(formatEmployeeValue(employee, fullTimeColumn)).toBe('Yes');
+  });
+});
+
 describe('filterEmployees', () => {
   const employees = getEmployees();
 
@@ -46,5 +85,14 @@ describe('filterEmployees', () => {
 
   it('一致しないときは空配列を返す', () => {
     expect(filterEmployees(employees, 'zzz')).toEqual([]);
+  });
+
+  it('渡した列定義だけを検索対象にする', () => {
+    const nameOnly = employeeColumns.filter((column) => column.field === 'name');
+
+    expect(filterEmployees(employees, 'finance', nameOnly)).toEqual([]);
+    expect(filterEmployees(employees, 'perry', nameOnly).map((employee) => employee.id)).toEqual([
+      1,
+    ]);
   });
 });

@@ -7,35 +7,38 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import { type Employee, formatFullTime, formatJoinDate } from '../data/employees';
+import {
+  type Employee,
+  type EmployeeColumn,
+  employeeColumns,
+  formatEmployeeValue,
+} from '../data/employees';
 
 type EmployeeTableProps = {
   employees: Employee[];
+  columns?: EmployeeColumn[];
 };
 
-export default function EmployeeTable({ employees }: EmployeeTableProps) {
+export default function EmployeeTable({
+  employees,
+  columns = employeeColumns,
+}: EmployeeTableProps) {
   return (
     <TableContainer component={Paper} variant="outlined">
       <Table aria-label="Employees">
         <TableHead>
           <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Age</TableCell>
-            <TableCell>Join date</TableCell>
-            <TableCell>Department</TableCell>
-            <TableCell>Full-time</TableCell>
+            {columns.map((column) => (
+              <TableCell key={column.field}>{column.header}</TableCell>
+            ))}
           </TableRow>
         </TableHead>
         <TableBody>
           {employees.map((employee) => (
             <TableRow key={employee.id}>
-              <TableCell>{employee.id}</TableCell>
-              <TableCell>{employee.name}</TableCell>
-              <TableCell>{employee.age}</TableCell>
-              <TableCell>{formatJoinDate(employee.joinDate)}</TableCell>
-              <TableCell>{employee.role}</TableCell>
-              <TableCell>{formatFullTime(employee.isFullTime)}</TableCell>
+              {columns.map((column) => (
+                <TableCell key={column.field}>{formatEmployeeValue(employee, column)}</TableCell>
+              ))}
             </TableRow>
           ))}
         </TableBody>
