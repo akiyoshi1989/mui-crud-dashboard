@@ -95,4 +95,21 @@ describe('filterEmployees', () => {
       1,
     ]);
   });
+
+  it('列をまたいだクエリでは絞り込まない', () => {
+    expect(filterEmployees(employees, 'perry 25')).toEqual([]);
+    expect(filterEmployees(employees, 'y 2')).toEqual([]);
+  });
+
+  it('25 は年齢の部分一致だけが当たり日付では全件残らない', () => {
+    expect(filterEmployees(employees, '25').map((employee) => employee.id)).toEqual([1]);
+  });
+
+  it('日付は表示値の完全一致だけが当たる', () => {
+    expect(filterEmployees(employees, '2025-07-16').map((employee) => employee.id)).toEqual([
+      1, 2, 3,
+    ]);
+    expect(filterEmployees(employees, '2025')).toEqual([]);
+    expect(filterEmployees(employees, '16')).toEqual([]);
+  });
 });

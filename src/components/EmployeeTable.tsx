@@ -24,12 +24,14 @@ export default function EmployeeTable({
   columns = employeeColumns,
 }: EmployeeTableProps) {
   return (
-    <TableContainer component={Paper} variant="outlined">
-      <Table aria-label="Employees">
+    <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
+      <Table aria-label="Employees" size="small" sx={{ width: 'max-content' }}>
         <TableHead>
           <TableRow>
             {columns.map((column) => (
-              <TableCell key={column.field}>{column.header}</TableCell>
+              <TableCell key={column.field} sx={{ whiteSpace: 'nowrap' }}>
+                {column.header}
+              </TableCell>
             ))}
           </TableRow>
         </TableHead>
@@ -37,7 +39,9 @@ export default function EmployeeTable({
           {employees.map((employee) => (
             <TableRow key={employee.id}>
               {columns.map((column) => (
-                <TableCell key={column.field}>{formatEmployeeValue(employee, column)}</TableCell>
+                <TableCell key={column.field} sx={{ whiteSpace: 'nowrap' }}>
+                  {formatEmployeeValue(employee, column)}
+                </TableCell>
               ))}
             </TableRow>
           ))}

@@ -18,6 +18,7 @@ describe('EmployeeListPage', () => {
     expect(screen.getByRole('table', { name: 'Employees' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Department' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Full-time' })).toBeInTheDocument();
 
     for (const employee of getEmployees()) {
       expect(screen.getByRole('cell', { name: employee.name })).toBeInTheDocument();
@@ -41,6 +42,21 @@ describe('EmployeeListPage', () => {
 
     expect(screen.getByRole('cell', { name: 'Josephine Drake' })).toBeInTheDocument();
     expect(screen.queryByRole('cell', { name: 'Edward Perry' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('cell', { name: 'Cody Phillips' })).not.toBeInTheDocument();
+  });
+
+  it('25 は年齢 25 の行だけが残り日付では全件残らない', async () => {
+    const user = userEvent.setup();
+    render(
+      <ThemeProvider theme={theme}>
+        <EmployeeListPage />
+      </ThemeProvider>,
+    );
+
+    await user.type(screen.getByRole('textbox', { name: 'Search' }), '25');
+
+    expect(screen.getByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
+    expect(screen.queryByRole('cell', { name: 'Josephine Drake' })).not.toBeInTheDocument();
     expect(screen.queryByRole('cell', { name: 'Cody Phillips' })).not.toBeInTheDocument();
   });
 });

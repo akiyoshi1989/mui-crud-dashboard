@@ -54,14 +54,18 @@ export function formatEmployeeValue(employee: Employee, column: EmployeeColumn):
   return String(value);
 }
 
-export function getEmployeeSearchText(
+export function matchesEmployeeColumn(
   employee: Employee,
-  columns: EmployeeColumn[] = employeeColumns,
-): string {
-  return columns
-    .map((column) => formatEmployeeValue(employee, column))
-    .join(' ')
-    .toLowerCase();
+  column: EmployeeColumn,
+  query: string,
+): boolean {
+  const value = formatEmployeeValue(employee, column).toLowerCase();
+
+  if (column.type === 'date') {
+    return value === query;
+  }
+
+  return value.includes(query);
 }
 
 export function filterEmployees(
@@ -76,6 +80,6 @@ export function filterEmployees(
   }
 
   return employees.filter((employee) =>
-    getEmployeeSearchText(employee, columns).includes(normalized),
+    columns.some((column) => matchesEmployeeColumn(employee, column, normalized)),
   );
 }
