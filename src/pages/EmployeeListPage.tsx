@@ -27,7 +27,7 @@ import {
 export default function EmployeeListPage() {
   const [query, setQuery] = useState('');
   const [field, setField] = useState<keyof Employee>(defaultSearchField);
-  const { data: allEmployees = [], isError, isPending } = useEmployees();
+  const { data: allEmployees, isError, isPending } = useEmployees();
   const column = getEmployeeColumn(field);
   const employees = useMemo(
     () => filterEmployees(allEmployees, query, column),

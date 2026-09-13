@@ -7,16 +7,19 @@ export const employeesQuery = queryOptions({
 });
 
 export function useEmployees() {
-  return useQuery(employeesQuery);
+  const { data = [], isError, isPending } = useQuery(employeesQuery);
+
+  return { data, isError, isPending };
 }
 
 export function useCreateEmployee() {
   const queryClient = useQueryClient();
-
-  return useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: createEmployee,
     onSuccess: async () => {
       await queryClient.invalidateQueries(employeesQuery);
     },
   });
+
+  return { mutate, isPending };
 }

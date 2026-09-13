@@ -28,10 +28,11 @@ describe('useEmployees', () => {
     const { Wrapper } = createWrapper();
     const { result } = renderHook(() => useEmployees(), { wrapper: Wrapper });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.data).toHaveLength(employeeSeed.length));
 
-    expect(result.current.data).toHaveLength(employeeSeed.length);
-    expect(result.current.data?.map((employee) => employee.name)).toEqual([
+    const { data } = result.current;
+
+    expect(data.map((employee) => employee.name)).toEqual([
       'Edward Perry',
       'Josephine Drake',
       'Cody Phillips',
@@ -44,7 +45,10 @@ describe('useEmployees', () => {
     const { Wrapper } = createWrapper();
     const { result } = renderHook(() => useEmployees(), { wrapper: Wrapper });
 
-    await waitFor(() => expect(result.current.isError).toBe(true));
+    await waitFor(() => {
+      const { isError } = result.current;
+      expect(isError).toBe(true);
+    });
   });
 });
 
@@ -53,13 +57,13 @@ describe('useCreateEmployee', () => {
     const { queryClient, Wrapper } = createWrapper();
     const { result: list } = renderHook(() => useEmployees(), { wrapper: Wrapper });
 
-    await waitFor(() => expect(list.current.isSuccess).toBe(true));
-    expect(list.current.data).toHaveLength(3);
+    await waitFor(() => expect(list.current.data).toHaveLength(3));
 
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const { result: create } = renderHook(() => useCreateEmployee(), { wrapper: Wrapper });
+    const { mutate } = create.current;
 
-    await create.current.mutateAsync({
+    mutate({
       name: 'Ada Lovelace',
       age: '36',
       joinDate: '2026-01-15',
@@ -67,8 +71,10 @@ describe('useCreateEmployee', () => {
       isFullTime: true,
     });
 
-    expect(invalidateSpy).toHaveBeenCalledWith(employeesQuery);
+    await waitFor(() => expect(invalidateSpy).toHaveBeenCalledWith(employeesQuery));
     await waitFor(() => expect(list.current.data).toHaveLength(4));
-    expect(list.current.data?.at(-1)).toMatchObject({ name: 'Ada Lovelace' });
+
+    const { data } = list.current;
+    expect(data.at(-1)).toMatchObject({ name: 'Ada Lovelace' });
   });
 });
