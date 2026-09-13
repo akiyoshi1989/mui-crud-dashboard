@@ -17,8 +17,8 @@
 - `QueryClientProvider` は `App` で包む
 - 一覧は `useEmployees()`（`useQuery` + `getEmployees()`）
 - 追加は `useCreateEmployee()`（`useMutation` + `createEmployee()`）
-- 作成成功後は `employees` の query を invalidate し、一覧へ戻ったときに追加行が見える
-- query key は `employeeQueryKeys` に集約する
+- 作成成功後は `employeesQuery` を invalidate し、一覧へ戻ったときに追加行が見える
+- query の key と fn は `queryOptions` でセット管理する（`employeesQuery`）
 - 通信失敗時の再試行はしない（現行の 1 回取得と同じ）
 
 ## 画面

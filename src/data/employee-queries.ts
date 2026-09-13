@@ -1,25 +1,22 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createEmployee, type EmployeeFormValues, getEmployees } from './employees';
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createEmployee, getEmployees } from './employees';
 
-export const employeeQueryKeys = {
-  all: ['employees'] as const,
-  list: () => [...employeeQueryKeys.all, 'list'] as const,
-};
+export const employeesQuery = queryOptions({
+  queryKey: ['employees'] as const,
+  queryFn: getEmployees,
+});
 
 export function useEmployees() {
-  return useQuery({
-    queryKey: employeeQueryKeys.list(),
-    queryFn: getEmployees,
-  });
+  return useQuery(employeesQuery);
 }
 
 export function useCreateEmployee() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (values: EmployeeFormValues) => createEmployee(values),
+    mutationFn: createEmployee,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: employeeQueryKeys.all });
+      await queryClient.invalidateQueries(employeesQuery);
     },
   });
 }

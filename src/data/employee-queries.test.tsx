@@ -3,8 +3,8 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { createQueryClient } from '../query-client';
-import { employeeQueryKeys, useCreateEmployee, useEmployees } from './employee-queries';
-import { employeeSeed } from './employees';
+import { employeesQuery, useCreateEmployee, useEmployees } from './employee-queries';
+import { employeeSeed, getEmployees } from './employees';
 
 function createWrapper() {
   const queryClient = createQueryClient();
@@ -16,9 +16,10 @@ function createWrapper() {
   return { queryClient, Wrapper };
 }
 
-describe('employeeQueryKeys', () => {
-  it('一覧の query key を返す', () => {
-    expect(employeeQueryKeys.list()).toEqual(['employees', 'list']);
+describe('employeesQuery', () => {
+  it('query key と query fn をセットで持つ', () => {
+    expect(employeesQuery.queryKey).toEqual(['employees']);
+    expect(employeesQuery.queryFn).toBe(getEmployees);
   });
 });
 
@@ -66,7 +67,7 @@ describe('useCreateEmployee', () => {
       isFullTime: true,
     });
 
-    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: employeeQueryKeys.all });
+    expect(invalidateSpy).toHaveBeenCalledWith(employeesQuery);
     await waitFor(() => expect(list.current.data).toHaveLength(4));
     expect(list.current.data?.at(-1)).toMatchObject({ name: 'Ada Lovelace' });
   });
