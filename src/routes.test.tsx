@@ -17,10 +17,11 @@ function renderPath(path: string) {
 }
 
 describe('routes', () => {
-  it('ホームを表示する', () => {
-    renderPath('/');
+  it.each(['/', '/employees'])('%s で従業員テーブルを表示する', (path) => {
+    renderPath(path);
 
-    expect(screen.getByRole('heading', { name: 'MUI CRUD Dashboard' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Employees' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
   });
 
   it('未定義パスで404を表示しホームへ戻れる', async () => {
@@ -31,6 +32,6 @@ describe('routes', () => {
 
     await user.click(screen.getByRole('link', { name: 'ホームへ戻る' }));
 
-    expect(screen.getByRole('heading', { name: 'MUI CRUD Dashboard' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Employees' })).toBeInTheDocument();
   });
 });
