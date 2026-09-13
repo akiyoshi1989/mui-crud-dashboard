@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { appPaths } from '../app-paths';
-import { exampleNavItems, getInitiallyOpenNavIds, isNavSelected } from './nav-items';
+import {
+  exampleNavItems,
+  getInitiallyOpenNavIds,
+  isNavSelected,
+  toggleOpenNavIds,
+} from './nav-items';
 
 describe('isNavSelected', () => {
   it('ホームと従業員パスで Employees を選択する', () => {
@@ -19,10 +24,17 @@ describe('isNavSelected', () => {
     );
   });
 
-  it('自身のパス配下を選択する', () => {
-    expect(isNavSelected(appPaths.reportsSales, { id: 'reports', path: appPaths.reports })).toBe(
-      true,
-    );
+  it('子を持つ親は exact match のときだけ選択する', () => {
+    const reports = exampleNavItems[0];
+
+    expect(isNavSelected(appPaths.reports, reports)).toBe(true);
+    expect(isNavSelected(appPaths.reportsSales, reports)).toBe(false);
+  });
+
+  it('子項目は自身のパス配下を選択する', () => {
+    expect(
+      isNavSelected(appPaths.reportsSales, { id: 'reports-sales', path: appPaths.reportsSales }),
+    ).toBe(true);
     expect(
       isNavSelected(appPaths.reports, { id: 'reports-sales', path: appPaths.reportsSales }),
     ).toBe(false);
@@ -36,5 +48,12 @@ describe('getInitiallyOpenNavIds', () => {
 
   it('無関係なパスでは親項目を開かない', () => {
     expect(getInitiallyOpenNavIds(appPaths.home, exampleNavItems)).toEqual([]);
+  });
+});
+
+describe('toggleOpenNavIds', () => {
+  it('未開の項目を開き、開いている項目を閉じる', () => {
+    expect(toggleOpenNavIds([], 'reports')).toEqual(['reports']);
+    expect(toggleOpenNavIds(['reports'], 'reports')).toEqual([]);
   });
 });

@@ -36,10 +36,17 @@
 | Example items | Traffic | `/reports/traffic` |
 | Example items | Integrations | `/integrations` |
 
-選択状態:
+選択状態（公式テンプレート準拠）:
 
 - Employees は `/` と `/employees` 配下で選択する
-- それ以外は自身のパス配下で選択する
+- 子を持つ親項目（Reports）は自身のパスと exact match のときだけ選択する
+- 子項目は自身のパス配下で選択する
+
+開閉:
+
+- 子を持つ親項目のクリックは配下の開閉をトグルする
+- 開閉状態は `aria-expanded` で示す
+- 配下のパスにいるときは、初期表示で親を開く
 
 ## レスポンシブ
 
@@ -54,4 +61,5 @@
 - Employees がホームで選択状態になる
 - `md` 未満でメニューボタンからサイドバーを開閉できる
 - ナビ項目の選択判定が UT で検証される
+- Reports の開閉がトグルでき、`aria-expanded` が同期する
 - `npm run lint` / `npm run test` / `npm run build` が成功する

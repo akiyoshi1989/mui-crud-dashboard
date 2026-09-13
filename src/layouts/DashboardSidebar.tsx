@@ -19,6 +19,7 @@ import {
   isNavSelected,
   mainNavItems,
   type NavItem,
+  toggleOpenNavIds,
 } from './nav-items';
 
 const navIcons: Record<string, ReactNode> = {
@@ -49,10 +50,11 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
         <ListItemButton
           component={Link}
           to={item.path}
-          selected={hasChildren ? pathname === item.path : selected}
+          selected={selected}
+          aria-expanded={hasChildren ? isOpen : undefined}
           onClick={() => {
-            if (hasChildren && !isOpen) {
-              setOpenIds((current) => [...current, item.id]);
+            if (hasChildren) {
+              setOpenIds((current) => toggleOpenNavIds(current, item.id));
             }
             onNavigate?.();
           }}

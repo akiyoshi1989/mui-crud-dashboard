@@ -32,21 +32,35 @@ export const exampleNavItems: NavItem[] = [
   },
 ];
 
-export function isNavSelected(pathname: string, item: Pick<NavItem, 'id' | 'path'>): boolean {
+export function isNavSelected(
+  pathname: string,
+  item: Pick<NavItem, 'id' | 'path' | 'children'>,
+): boolean {
   if (item.id === 'employees' && pathname === appPaths.home) {
     return true;
+  }
+
+  if (item.children?.length) {
+    return pathname === item.path;
   }
 
   return pathname === item.path || pathname.startsWith(`${item.path}/`);
 }
 
+export function isNavBranchActive(pathname: string, item: NavItem): boolean {
+  if (pathname === item.path || pathname.startsWith(`${item.path}/`)) {
+    return true;
+  }
+
+  return Boolean(item.children?.some((child) => isNavSelected(pathname, child)));
+}
+
 export function getInitiallyOpenNavIds(pathname: string, items: NavItem[]): string[] {
   return items
-    .filter(
-      (item) =>
-        Boolean(item.children?.length) &&
-        (isNavSelected(pathname, item) ||
-          item.children?.some((child) => isNavSelected(pathname, child))),
-    )
+    .filter((item) => Boolean(item.children?.length) && isNavBranchActive(pathname, item))
     .map((item) => item.id);
+}
+
+export function toggleOpenNavIds(current: string[], itemId: string): string[] {
+  return current.includes(itemId) ? current.filter((id) => id !== itemId) : [...current, itemId];
 }
