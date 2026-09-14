@@ -27,6 +27,8 @@
 - `GET /api/employees/:id` を使う
 - 呼び出しは `useEmployee(id)`（`useQuery` + `getEmployee()`）
 - query の key と fn は `queryOptions` でセット管理する（`employeeQuery(id)`、key は `['employees', id]`）
+- `employeeId` は `useParams<{ employeeId: string }>()` で受け取り、`parseEmployeeId()` で正の整数だけ通す
+- 不正な ID では `useEmployee` を `skipToken` にし、API を呼ばない
 - 一覧と同じ項目に加え、生年月日 `birthDate` を API から取得する
 - `birthDate` は ISO 8601 文字列とする
 - 一覧の `employeeColumns` には生年月日を含めない
@@ -34,6 +36,7 @@
 | 失敗 | コード | 表示文 |
 | --- | --- | --- |
 | GET `/api/employees/:id` | `load-employee` | 従業員を取得できませんでした |
+| 不正な `employeeId` | — | 従業員 ID が無効です |
 
 失敗時は [09-api-error.md](./09-api-error.md) のエラーコンポーネントを出す。
 
@@ -47,6 +50,7 @@
 - Full-time は `Yes` / `No`
 - 読み込み中はプログレスを出す
 - 取得失敗時は一覧・詳細項目を出さない
+- 不正な `employeeId` では API を呼ばずエラーコンポーネントを出す
 
 ## 受け入れ条件
 
@@ -55,4 +59,5 @@
 - 詳細に一覧項目と生年月日が出る
 - 一覧テーブルに生年月日列は出ない
 - 取得失敗で表示文とトップへのリンクが出る
+- 不正な `employeeId` で表示文とトップへのリンクが出る
 - `npm run lint` / `npm run test` / `npm run build` が成功する

@@ -64,6 +64,20 @@ export function employeeApiPath(employeeId: number): string {
   return `${employeesApiPath}/${employeeId}`;
 }
 
+export function parseEmployeeId(value: string | undefined): number | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  const employeeId = Number(value);
+
+  if (!Number.isInteger(employeeId) || employeeId <= 0) {
+    return undefined;
+  }
+
+  return employeeId;
+}
+
 export const employeeRoles = employeeRoleSchema.options;
 
 export const employeeColumns: EmployeeColumn[] = [

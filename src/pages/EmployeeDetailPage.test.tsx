@@ -4,7 +4,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
 import { employeeApiErrorCodes } from '../data/employee-api-error';
 import { employeeDetailColumns, employeeSeed, formatEmployeeValue } from '../data/employees';
-import { errorPageMessages } from '../errors/get-error-page-message';
+import { errorPageMessages, invalidEmployeeIdMessage } from '../errors/get-error-page-message';
 import { routes } from '../routes';
 import { QueryProvider } from '../test/query-provider';
 import { theme } from '../theme';
@@ -54,5 +54,18 @@ describe('EmployeeDetailPage', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'トップ画面へ戻る' })).toHaveAttribute('href', '/');
     expect(screen.queryByText('Date of birth')).not.toBeInTheDocument();
+  });
+
+  it('不正な ID では API を呼ばずエラーコンポーネントを表示する', async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal('fetch', fetchSpy);
+    renderDetailPage('/employees/abc');
+
+    expect(
+      await screen.findByRole('heading', { name: invalidEmployeeIdMessage }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'トップ画面へ戻る' })).toHaveAttribute('href', '/');
+    expect(screen.queryByText('Date of birth')).not.toBeInTheDocument();
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 });

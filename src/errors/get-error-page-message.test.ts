@@ -4,6 +4,7 @@ import {
   errorPageMessages,
   fallbackErrorPageMessage,
   getErrorPageMessage,
+  invalidEmployeeIdMessage,
 } from './get-error-page-message';
 
 describe('getErrorPageMessage', () => {
@@ -37,5 +38,6 @@ describe('getErrorPageMessage', () => {
     expect(
       getErrorPageMessage(new EmployeeApiError(employeeApiErrorCodes.invalidEmployeeForm)),
     ).toBe(fallbackErrorPageMessage);
+    expect(invalidEmployeeIdMessage).toBe('従業員 ID が無効です');
   });
 });

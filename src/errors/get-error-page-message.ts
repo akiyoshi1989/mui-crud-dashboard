@@ -12,6 +12,7 @@ export const errorPageMessages = {
 } as const;
 
 export const fallbackErrorPageMessage = '処理に失敗しました';
+export const invalidEmployeeIdMessage = '従業員 ID が無効です';
 
 const employeeApiErrorCodeSet = new Set<string>(Object.values(employeeApiErrorCodes));
 

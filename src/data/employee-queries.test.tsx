@@ -66,6 +66,16 @@ describe('useEmployee', () => {
       expect(error).toMatchObject({ code: employeeApiErrorCodes.loadEmployee });
     });
   });
+
+  it('id が無いときは API を呼ばない', () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal('fetch', fetchSpy);
+
+    const { Wrapper } = createWrapper();
+    renderHook(() => useEmployee(undefined), { wrapper: Wrapper });
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
 });
 
 describe('useEmployees', () => {

@@ -17,9 +17,26 @@ import {
   getEmployeeColumn,
   getEmployeeFormColumns,
   getEmployees,
+  parseEmployeeId,
   toEmployeePayload,
   validateEmployeeForm,
 } from './employees';
+
+describe('parseEmployeeId', () => {
+  it('正の整数だけ通す', () => {
+    expect(parseEmployeeId('1')).toBe(1);
+    expect(parseEmployeeId('42')).toBe(42);
+  });
+
+  it('不正な値は undefined にする', () => {
+    expect(parseEmployeeId(undefined)).toBeUndefined();
+    expect(parseEmployeeId('')).toBeUndefined();
+    expect(parseEmployeeId('abc')).toBeUndefined();
+    expect(parseEmployeeId('1.5')).toBeUndefined();
+    expect(parseEmployeeId('0')).toBeUndefined();
+    expect(parseEmployeeId('-1')).toBeUndefined();
+  });
+});
 
 describe('getEmployees', () => {
   it('API 失敗はコード付きエラーにする', async () => {

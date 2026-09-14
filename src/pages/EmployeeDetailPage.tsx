@@ -2,12 +2,17 @@ import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import { useParams } from 'react-router';
 import ErrorPage from '../components/ErrorPage';
 import { useEmployee } from '../data/employee-queries';
-import { employeeDetailColumns, formatEmployeeValue } from '../data/employees';
-import { getErrorPageMessage } from '../errors/get-error-page-message';
+import { employeeDetailColumns, formatEmployeeValue, parseEmployeeId } from '../data/employees';
+import { getErrorPageMessage, invalidEmployeeIdMessage } from '../errors/get-error-page-message';
 
 export default function EmployeeDetailPage() {
-  const { employeeId } = useParams();
-  const { data: employee, error, isError, isPending } = useEmployee(Number(employeeId));
+  const { employeeId } = useParams<{ employeeId: string }>();
+  const employeeIdNumber = parseEmployeeId(employeeId);
+  const { data: employee, error, isError, isPending } = useEmployee(employeeIdNumber);
+
+  if (employeeIdNumber === undefined) {
+    return <ErrorPage message={invalidEmployeeIdMessage} />;
+  }
 
   if (isError) {
     return <ErrorPage message={getErrorPageMessage(error)} />;
