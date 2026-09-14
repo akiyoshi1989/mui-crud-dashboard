@@ -4,12 +4,16 @@ import {
   errorPageMessages,
   fallbackErrorPageMessage,
   getErrorPageMessage,
+  invalidEmployeeIdMessage,
 } from './get-error-page-message';
 
 describe('getErrorPageMessage', () => {
   it('API エラーコードから表示文を組み立てる', () => {
     expect(getErrorPageMessage(new EmployeeApiError(employeeApiErrorCodes.loadEmployees))).toBe(
       errorPageMessages[employeeApiErrorCodes.loadEmployees],
+    );
+    expect(getErrorPageMessage(new EmployeeApiError(employeeApiErrorCodes.loadEmployee))).toBe(
+      errorPageMessages[employeeApiErrorCodes.loadEmployee],
     );
     expect(getErrorPageMessage(new EmployeeApiError(employeeApiErrorCodes.createEmployee))).toBe(
       errorPageMessages[employeeApiErrorCodes.createEmployee],
@@ -34,5 +38,6 @@ describe('getErrorPageMessage', () => {
     expect(
       getErrorPageMessage(new EmployeeApiError(employeeApiErrorCodes.invalidEmployeeForm)),
     ).toBe(fallbackErrorPageMessage);
+    expect(invalidEmployeeIdMessage).toBe('従業員 ID が無効です');
   });
 });

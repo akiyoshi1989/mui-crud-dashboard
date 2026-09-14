@@ -21,6 +21,7 @@ type EmployeeTableProps = {
   columns?: EmployeeColumn[];
   deletingId?: number;
   onDelete?: (employee: Employee) => void;
+  onRowClick?: (employee: Employee) => void;
 };
 
 export function deleteEmployeeLabel(name: string): string {
@@ -32,6 +33,7 @@ export default function EmployeeTable({
   columns = employeeColumns,
   deletingId,
   onDelete,
+  onRowClick,
 }: EmployeeTableProps) {
   const showActions = Boolean(onDelete);
 
@@ -50,14 +52,24 @@ export default function EmployeeTable({
         </TableHead>
         <TableBody>
           {employees.map((employee) => (
-            <TableRow key={employee.id}>
+            <TableRow
+              key={employee.id}
+              hover={Boolean(onRowClick)}
+              onClick={onRowClick ? () => onRowClick(employee) : undefined}
+              sx={onRowClick ? { cursor: 'pointer' } : undefined}
+            >
               {columns.map((column) => (
                 <TableCell key={column.field} sx={{ whiteSpace: 'nowrap' }}>
                   {formatEmployeeValue(employee, column)}
                 </TableCell>
               ))}
               {showActions ? (
-                <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                <TableCell
+                  sx={{ whiteSpace: 'nowrap' }}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                  }}
+                >
                   <IconButton
                     aria-label={deleteEmployeeLabel(employee.name)}
                     disabled={deletingId === employee.id}

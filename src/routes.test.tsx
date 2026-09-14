@@ -39,6 +39,31 @@ describe('routes', () => {
     expect(screen.getByLabelText('Name')).toBeInTheDocument();
   });
 
+  it('行をクリックすると詳細を表示する', async () => {
+    const user = userEvent.setup();
+    renderPath('/employees');
+
+    await user.click(await screen.findByRole('cell', { name: 'Edward Perry' }));
+
+    expect(await screen.findByRole('heading', { name: 'Edward Perry' })).toBeInTheDocument();
+    expect(screen.getByText('Date of birth')).toBeInTheDocument();
+    expect(screen.getByText('2000-03-12')).toBeInTheDocument();
+    expect(screen.queryByRole('table', { name: 'Employees' })).not.toBeInTheDocument();
+  });
+
+  it('削除ボタンでは詳細へ遷移しない', async () => {
+    const user = userEvent.setup();
+    renderPath('/employees');
+
+    await user.click(
+      await screen.findByRole('button', { name: deleteEmployeeLabel('Edward Perry') }),
+    );
+
+    expect(screen.getByRole('dialog', { name: deleteConfirmTitle })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Edward Perry' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Date of birth')).not.toBeInTheDocument();
+  });
+
   it('従業員を追加すると一覧に表示される', async () => {
     const user = userEvent.setup();
     renderPath('/employees');

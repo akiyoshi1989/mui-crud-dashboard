@@ -4,6 +4,7 @@ import {
   createEmployee,
   deleteEmployee,
   employeeColumns,
+  employeeDetailColumns,
   employeeFormDataSchema,
   employeeFormValuesFromFormData,
   employeeSeed,
@@ -12,12 +13,30 @@ import {
   formatEmployeeValue,
   formatFullTime,
   formatJoinDate,
+  getEmployee,
   getEmployeeColumn,
   getEmployeeFormColumns,
   getEmployees,
+  parseEmployeeId,
   toEmployeePayload,
   validateEmployeeForm,
 } from './employees';
+
+describe('parseEmployeeId', () => {
+  it('正の整数だけ通す', () => {
+    expect(parseEmployeeId('1')).toBe(1);
+    expect(parseEmployeeId('42')).toBe(42);
+  });
+
+  it('不正な値は undefined にする', () => {
+    expect(parseEmployeeId(undefined)).toBeUndefined();
+    expect(parseEmployeeId('')).toBeUndefined();
+    expect(parseEmployeeId('abc')).toBeUndefined();
+    expect(parseEmployeeId('1.5')).toBeUndefined();
+    expect(parseEmployeeId('0')).toBeUndefined();
+    expect(parseEmployeeId('-1')).toBeUndefined();
+  });
+});
 
 describe('getEmployees', () => {
   it('API 失敗はコード付きエラーにする', async () => {
@@ -53,6 +72,24 @@ describe('formatFullTime', () => {
   });
 });
 
+describe('getEmployee', () => {
+  it('API から 1 件を返す', async () => {
+    await expect(getEmployee(1)).resolves.toMatchObject({
+      id: 1,
+      name: 'Edward Perry',
+      birthDate: '2000-03-12T00:00:00.000Z',
+    });
+  });
+
+  it('API 失敗はコード付きエラーにする', async () => {
+    vi.stubGlobal('fetch', async () => new Response('error', { status: 500 }));
+
+    await expect(getEmployee(1)).rejects.toMatchObject({
+      code: employeeApiErrorCodes.loadEmployee,
+    });
+  });
+});
+
 describe('employeeColumns', () => {
   it('表示列を一か所で定義する', () => {
     expect(employeeColumns.map((column) => column.field)).toEqual([
@@ -74,6 +111,20 @@ describe('employeeColumns', () => {
   });
 });
 
+describe('employeeDetailColumns', () => {
+  it('一覧列に生年月日を足す', () => {
+    expect(employeeDetailColumns.map((column) => column.field)).toEqual([
+      ...employeeColumns.map((column) => column.field),
+      'birthDate',
+    ]);
+    expect(employeeDetailColumns.at(-1)).toMatchObject({
+      field: 'birthDate',
+      header: 'Date of birth',
+      type: 'date',
+    });
+  });
+});
+
 describe('getEmployeeColumn', () => {
   it('field から列定義を返す', () => {
     expect(getEmployeeColumn('role').header).toBe('Department');
@@ -87,6 +138,13 @@ describe('formatEmployeeValue', () => {
     expect(formatEmployeeValue(employee, getEmployeeColumn('id'))).toBe('1');
     expect(formatEmployeeValue(employee, getEmployeeColumn('joinDate'))).toBe('2025-07-16');
     expect(formatEmployeeValue(employee, getEmployeeColumn('isFullTime'))).toBe('Yes');
+    const birthDateColumn = employeeDetailColumns.find((column) => column.field === 'birthDate');
+
+    if (!birthDateColumn) {
+      throw new Error('birthDate 列がない');
+    }
+
+    expect(formatEmployeeValue(employee, birthDateColumn)).toBe('2000-03-12');
   });
 });
 

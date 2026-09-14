@@ -39,6 +39,7 @@ describe('EmployeeListPage', () => {
     expect(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Department' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Full-time' })).toBeInTheDocument();
+    expect(screen.queryByRole('columnheader', { name: 'Date of birth' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Create' })).toHaveAttribute(
       'href',
       appPaths.employeeNew,

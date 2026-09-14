@@ -47,4 +47,34 @@ describe('EmployeeTable', () => {
     await user.click(screen.getByRole('button', { name: deleteEmployeeLabel('Edward Perry') }));
     expect(onDelete).toHaveBeenCalledWith(employeeSeed[0]);
   });
+
+  it('行クリックで onRowClick を呼ぶ', async () => {
+    const user = userEvent.setup();
+    const onRowClick = vi.fn();
+
+    render(
+      <ThemeProvider theme={theme}>
+        <EmployeeTable employees={employeeSeed} onRowClick={onRowClick} />
+      </ThemeProvider>,
+    );
+
+    await user.click(screen.getByRole('cell', { name: 'Edward Perry' }));
+    expect(onRowClick).toHaveBeenCalledWith(employeeSeed[0]);
+  });
+
+  it('削除ボタンでは onRowClick を呼ばない', async () => {
+    const user = userEvent.setup();
+    const onDelete = vi.fn();
+    const onRowClick = vi.fn();
+
+    render(
+      <ThemeProvider theme={theme}>
+        <EmployeeTable employees={employeeSeed} onDelete={onDelete} onRowClick={onRowClick} />
+      </ThemeProvider>,
+    );
+
+    await user.click(screen.getByRole('button', { name: deleteEmployeeLabel('Edward Perry') }));
+    expect(onDelete).toHaveBeenCalledWith(employeeSeed[0]);
+    expect(onRowClick).not.toHaveBeenCalled();
+  });
 });

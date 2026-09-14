@@ -17,6 +17,7 @@ export type Employee = {
   joinDate: string;
   role: EmployeeRole;
   isFullTime: boolean;
+  birthDate?: string;
 };
 
 export type EmployeeColumnType = 'text' | 'date' | 'boolean';
@@ -63,6 +64,20 @@ export function employeeApiPath(employeeId: number): string {
   return `${employeesApiPath}/${employeeId}`;
 }
 
+export function parseEmployeeId(value: string | undefined): number | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  const employeeId = Number(value);
+
+  if (!Number.isInteger(employeeId) || employeeId <= 0) {
+    return undefined;
+  }
+
+  return employeeId;
+}
+
 export const employeeRoles = employeeRoleSchema.options;
 
 export const employeeColumns: EmployeeColumn[] = [
@@ -72,6 +87,11 @@ export const employeeColumns: EmployeeColumn[] = [
   { field: 'joinDate', header: 'Join date', type: 'date' },
   { field: 'role', header: 'Department' },
   { field: 'isFullTime', header: 'Full-time', type: 'boolean' },
+];
+
+export const employeeDetailColumns: EmployeeColumn[] = [
+  ...employeeColumns,
+  { field: 'birthDate', header: 'Date of birth', type: 'date' },
 ];
 
 export const defaultSearchField: keyof Employee = 'name';
@@ -115,6 +135,20 @@ async function parseEmployeeResponse(
   return (await response.json()) as Employee;
 }
 
+export async function getEmployee(employeeId: number): Promise<Employee> {
+  try {
+    const response = await fetch(employeeApiPath(employeeId));
+
+    return await parseEmployeeResponse(response, employeeApiErrorCodes.loadEmployee);
+  } catch (error) {
+    if (error instanceof EmployeeApiError) {
+      throw error;
+    }
+
+    throw new EmployeeApiError(employeeApiErrorCodes.loadEmployee);
+  }
+}
+
 export async function getEmployees(): Promise<Employee[]> {
   try {
     const response = await fetch(employeesApiPath);
@@ -143,6 +177,10 @@ export function formatFullTime(isFullTime: boolean): string {
 
 export function formatEmployeeValue(employee: Employee, column: EmployeeColumn): string {
   const value = employee[column.field];
+
+  if (value === undefined) {
+    return '';
+  }
 
   if (column.type === 'date' && typeof value === 'string') {
     return formatJoinDate(value);

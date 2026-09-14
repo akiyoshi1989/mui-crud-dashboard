@@ -29,7 +29,8 @@
 | 9 | API エラー画面 | [09-api-error.md](./09-api-error.md) |
 | 10 | 従業員削除 | [10-employee-delete.md](./10-employee-delete.md) |
 | 11 | 従業員削除の確認 | [11-employee-delete-confirm.md](./11-employee-delete-confirm.md) |
-| 12 以降 | 詳細 / 編集 | 未作成。別ブランチで進める |
+| 12 | 従業員詳細 | [12-employee-detail.md](./12-employee-detail.md) |
+| 13 以降 | 編集 | 未作成。別ブランチで進める |
 
 ## 次の段階
 

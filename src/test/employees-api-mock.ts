@@ -49,6 +49,16 @@ export async function mockEmployeesApi(
   }
 
   const employeeId = Number(path.split('/').at(-1));
+  if (path === employeeApiPath(employeeId) && method === 'GET') {
+    const employee = employees.find((item) => item.id === employeeId);
+
+    if (!employee) {
+      return jsonResponse({ message: 'Not found' }, 404);
+    }
+
+    return jsonResponse(employee);
+  }
+
   if (path === employeeApiPath(employeeId) && method === 'DELETE') {
     const exists = employees.some((employee) => employee.id === employeeId);
 

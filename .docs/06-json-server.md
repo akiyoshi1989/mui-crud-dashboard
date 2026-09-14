@@ -17,7 +17,7 @@
 - リソース名は `employees`
 - JSON Server は `http://localhost:3001`
 - Vite は `/api` を JSON Server へプロキシする
-- アプリは `GET /api/employees` と `POST /api/employees` と `DELETE /api/employees/:id` を使う
+- アプリは `GET /api/employees` と `GET /api/employees/:id` と `POST /api/employees` と `DELETE /api/employees/:id` を使う
 - `id` は JSON Server が採番する
 
 ## 起動

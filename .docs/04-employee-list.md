@@ -8,7 +8,6 @@
 ## 対象外
 
 - Reload
-- 行クリックでの詳細遷移
 - 編集
 - 列ごとのフィルタ
 - ソート / ページネーション
@@ -36,6 +35,7 @@
 - 見出しは `Employees`
 - 見出し横に `Create` を置く（追加処理は [05-employee-create.md](./05-employee-create.md)）
 - 各行の削除は [10-employee-delete.md](./10-employee-delete.md)（確認は [11-employee-delete-confirm.md](./11-employee-delete-confirm.md)）
+- 行クリックでの詳細は [12-employee-detail.md](./12-employee-detail.md)
 - 追加ライブラリは使わず、既存の MUI `Table` で描画する
 - テーブルと検索は `employeeColumns` を参照する
 - 既知の表示名は ID / Name / Age / Join date / Department / Full-time

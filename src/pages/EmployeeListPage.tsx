@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { appPaths } from '../app-paths';
 import EmployeeDeleteConfirmDialog from '../components/EmployeeDeleteConfirmDialog';
 import EmployeeTable from '../components/EmployeeTable';
@@ -27,6 +27,7 @@ import {
 import { getErrorPageMessage } from '../errors/get-error-page-message';
 
 export default function EmployeeListPage() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [field, setField] = useState<keyof Employee>(defaultSearchField);
   const { data: allEmployees = [], error, isError, isPending } = useEmployees();
@@ -93,6 +94,9 @@ export default function EmployeeListPage() {
             employees={employees}
             deletingId={isDeleting ? deletingId : undefined}
             onDelete={setEmployeeToDelete}
+            onRowClick={(employee) => {
+              navigate(appPaths.employee(String(employee.id)));
+            }}
           />
         )}
       </Stack>

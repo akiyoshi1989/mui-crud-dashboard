@@ -1,13 +1,35 @@
-import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createEmployee, deleteEmployee, getEmployees } from './employees';
+import {
+  queryOptions,
+  skipToken,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+import { createEmployee, deleteEmployee, getEmployee, getEmployees } from './employees';
 
 export const employeesQuery = queryOptions({
   queryKey: ['employees'] as const,
   queryFn: getEmployees,
 });
 
+export function employeeQuery(employeeId: number) {
+  return queryOptions({
+    queryKey: ['employees', employeeId] as const,
+    queryFn: () => getEmployee(employeeId),
+  });
+}
+
 export function useEmployees() {
   const { data = [], error, isError, isPending } = useQuery(employeesQuery);
+
+  return { data, error, isError, isPending };
+}
+
+export function useEmployee(employeeId: number | undefined) {
+  const { data, error, isError, isPending } = useQuery({
+    queryKey: ['employees', employeeId] as const,
+    queryFn: employeeId === undefined ? skipToken : () => getEmployee(employeeId),
+  });
 
   return { data, error, isError, isPending };
 }

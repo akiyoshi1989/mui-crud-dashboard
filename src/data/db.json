@@ -6,7 +6,8 @@
       "age": 25,
       "joinDate": "2025-07-16T00:00:00.000Z",
       "role": "Finance",
-      "isFullTime": true
+      "isFullTime": true,
+      "birthDate": "2000-03-12T00:00:00.000Z"
     },
     {
       "id": 2,
@@ -14,7 +15,8 @@
       "age": 36,
       "joinDate": "2025-07-16T00:00:00.000Z",
       "role": "Market",
-      "isFullTime": false
+      "isFullTime": false,
+      "birthDate": "1989-11-04T00:00:00.000Z"
     },
     {
       "id": 3,
@@ -22,7 +24,8 @@
       "age": 19,
       "joinDate": "2025-07-16T00:00:00.000Z",
       "role": "Development",
-      "isFullTime": true
+      "isFullTime": true,
+      "birthDate": "2006-08-21T00:00:00.000Z"
     }
   ]
 }
