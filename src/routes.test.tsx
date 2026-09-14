@@ -1,8 +1,10 @@
 import { ThemeProvider } from '@mui/material/styles';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
+import { deleteConfirmLabel, deleteConfirmTitle } from './components/EmployeeDeleteConfirmDialog';
+import { deleteEmployeeLabel } from './components/EmployeeTable';
 import { employeeApiErrorCodes } from './data/employee-api-error';
 import { errorPageMessages } from './errors/get-error-page-message';
 import { routes } from './routes';
@@ -71,6 +73,21 @@ describe('routes', () => {
 
     expect(await screen.findByRole('heading', { name: 'Employees' })).toBeInTheDocument();
     expect(await screen.findByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
+  });
+
+  it('従業員を削除すると一覧から消える', async () => {
+    const user = userEvent.setup();
+    renderPath('/employees');
+
+    expect(await screen.findByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: deleteEmployeeLabel('Edward Perry') }));
+    await user.click(screen.getByRole('button', { name: deleteConfirmLabel }));
+    await waitForElementToBeRemoved(() =>
+      screen.queryByRole('dialog', { name: deleteConfirmTitle }),
+    );
+
+    expect(screen.queryByRole('cell', { name: 'Edward Perry' })).not.toBeInTheDocument();
+    expect(await screen.findByRole('cell', { name: 'Josephine Drake' })).toBeInTheDocument();
   });
 
   it('未定義パスで404を表示しホームへ戻れる', async () => {

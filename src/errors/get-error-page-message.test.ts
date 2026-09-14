@@ -14,6 +14,9 @@ describe('getErrorPageMessage', () => {
     expect(getErrorPageMessage(new EmployeeApiError(employeeApiErrorCodes.createEmployee))).toBe(
       errorPageMessages[employeeApiErrorCodes.createEmployee],
     );
+    expect(getErrorPageMessage(new EmployeeApiError(employeeApiErrorCodes.deleteEmployee))).toBe(
+      errorPageMessages[employeeApiErrorCodes.deleteEmployee],
+    );
   });
 
   it('cause に載った API エラーコードからも表示文を組み立てる', () => {

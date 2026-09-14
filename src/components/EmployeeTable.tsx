@@ -1,4 +1,6 @@
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -17,12 +19,22 @@ import {
 type EmployeeTableProps = {
   employees: Employee[];
   columns?: EmployeeColumn[];
+  deletingId?: number;
+  onDelete?: (employee: Employee) => void;
 };
+
+export function deleteEmployeeLabel(name: string): string {
+  return `Delete ${name}`;
+}
 
 export default function EmployeeTable({
   employees,
   columns = employeeColumns,
+  deletingId,
+  onDelete,
 }: EmployeeTableProps) {
+  const showActions = Boolean(onDelete);
+
   return (
     <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
       <Table aria-label="Employees" size="small" sx={{ width: 'max-content' }}>
@@ -33,6 +45,7 @@ export default function EmployeeTable({
                 {column.header}
               </TableCell>
             ))}
+            {showActions ? <TableCell sx={{ whiteSpace: 'nowrap' }}>Actions</TableCell> : null}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -43,6 +56,18 @@ export default function EmployeeTable({
                   {formatEmployeeValue(employee, column)}
                 </TableCell>
               ))}
+              {showActions ? (
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                  <IconButton
+                    aria-label={deleteEmployeeLabel(employee.name)}
+                    disabled={deletingId === employee.id}
+                    onClick={() => onDelete?.(employee)}
+                    size="small"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              ) : null}
             </TableRow>
           ))}
         </TableBody>

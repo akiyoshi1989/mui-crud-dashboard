@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { EmployeeApiError, employeeApiErrorCodes } from './employee-api-error';
 import {
   createEmployee,
+  deleteEmployee,
   employeeColumns,
   employeeFormDataSchema,
   employeeFormValuesFromFormData,
@@ -269,5 +270,23 @@ describe('createEmployee', () => {
       code: employeeApiErrorCodes.invalidEmployeeForm,
     });
     expect(await getEmployees()).toHaveLength(3);
+  });
+});
+
+describe('deleteEmployee', () => {
+  it('API へ DELETE して従業員を削除する', async () => {
+    await deleteEmployee(1);
+
+    const employees = await getEmployees();
+    expect(employees).toHaveLength(2);
+    expect(employees.map((employee) => employee.id)).toEqual([2, 3]);
+  });
+
+  it('API 失敗はコード付きエラーにする', async () => {
+    vi.stubGlobal('fetch', async () => new Response('error', { status: 500 }));
+
+    await expect(deleteEmployee(1)).rejects.toMatchObject({
+      code: employeeApiErrorCodes.deleteEmployee,
+    });
   });
 });

@@ -13,9 +13,10 @@ import {
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { appPaths } from '../app-paths';
+import EmployeeDeleteConfirmDialog from '../components/EmployeeDeleteConfirmDialog';
 import EmployeeTable from '../components/EmployeeTable';
 import ErrorPage from '../components/ErrorPage';
-import { useEmployees } from '../data/employee-queries';
+import { useDeleteEmployee, useEmployees } from '../data/employee-queries';
 import {
   defaultSearchField,
   type Employee,
@@ -29,6 +30,13 @@ export default function EmployeeListPage() {
   const [query, setQuery] = useState('');
   const [field, setField] = useState<keyof Employee>(defaultSearchField);
   const { data: allEmployees = [], error, isError, isPending } = useEmployees();
+  const {
+    isPending: isDeleting,
+    mutate: deleteEmployeeById,
+    variables: deletingId,
+  } = useDeleteEmployee();
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
   const column = getEmployeeColumn(field);
   const employees = useMemo(
     () => filterEmployees(allEmployees, query, column),
@@ -37,6 +45,10 @@ export default function EmployeeListPage() {
 
   if (isError) {
     return <ErrorPage message={getErrorPageMessage(error)} />;
+  }
+
+  if (deleteError) {
+    return <ErrorPage message={deleteError} />;
   }
 
   return (
@@ -77,9 +89,35 @@ export default function EmployeeListPage() {
         {isPending ? (
           <CircularProgress aria-label="Loading employees" />
         ) : (
-          <EmployeeTable employees={employees} />
+          <EmployeeTable
+            employees={employees}
+            deletingId={isDeleting ? deletingId : undefined}
+            onDelete={setEmployeeToDelete}
+          />
         )}
       </Stack>
+      <EmployeeDeleteConfirmDialog
+        open={employeeToDelete !== null}
+        isDeleting={isDeleting}
+        onCancel={() => {
+          setEmployeeToDelete(null);
+        }}
+        onConfirm={() => {
+          if (!employeeToDelete) {
+            return;
+          }
+
+          deleteEmployeeById(employeeToDelete.id, {
+            onSuccess: () => {
+              setEmployeeToDelete(null);
+            },
+            onError: (cause) => {
+              setEmployeeToDelete(null);
+              setDeleteError(getErrorPageMessage(cause));
+            },
+          });
+        }}
+      />
     </Box>
   );
 }

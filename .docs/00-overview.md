@@ -27,7 +27,9 @@
 | 7 | TanStack Query 導入 | [07-tanstack-query.md](./07-tanstack-query.md) |
 | 8 | GitHub Actions CI | [08-github-actions-ci.md](./08-github-actions-ci.md) |
 | 9 | API エラー画面 | [09-api-error.md](./09-api-error.md) |
-| 10 以降 | 詳細 / 編集 / 削除 | 未作成。別ブランチで進める |
+| 10 | 従業員削除 | [10-employee-delete.md](./10-employee-delete.md) |
+| 11 | 従業員削除の確認 | [11-employee-delete-confirm.md](./11-employee-delete-confirm.md) |
+| 12 以降 | 詳細 / 編集 | 未作成。別ブランチで進める |
 
 ## 次の段階
 

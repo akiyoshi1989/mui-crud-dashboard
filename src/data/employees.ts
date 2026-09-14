@@ -59,6 +59,10 @@ export type EmployeeFormErrors = Partial<Record<keyof EmployeeFormValues, string
 
 export const employeesApiPath = '/api/employees';
 
+export function employeeApiPath(employeeId: number): string {
+  return `${employeesApiPath}/${employeeId}`;
+}
+
 export const employeeRoles = employeeRoleSchema.options;
 
 export const employeeColumns: EmployeeColumn[] = [
@@ -217,5 +221,21 @@ export async function createEmployee(values: EmployeeFormValues): Promise<Employ
     }
 
     throw new EmployeeApiError(employeeApiErrorCodes.createEmployee);
+  }
+}
+
+export async function deleteEmployee(employeeId: number): Promise<void> {
+  try {
+    const response = await fetch(employeeApiPath(employeeId), { method: 'DELETE' });
+
+    if (!response.ok) {
+      throw new EmployeeApiError(employeeApiErrorCodes.deleteEmployee);
+    }
+  } catch (error) {
+    if (error instanceof EmployeeApiError) {
+      throw error;
+    }
+
+    throw new EmployeeApiError(employeeApiErrorCodes.deleteEmployee);
   }
 }
