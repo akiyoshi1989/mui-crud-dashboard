@@ -1,5 +1,4 @@
 import {
-  Alert,
   Box,
   Button,
   CircularProgress,
@@ -15,6 +14,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { appPaths } from '../app-paths';
 import EmployeeTable from '../components/EmployeeTable';
+import ErrorPage from '../components/ErrorPage';
 import { useEmployees } from '../data/employee-queries';
 import {
   defaultSearchField,
@@ -23,16 +23,21 @@ import {
   filterEmployees,
   getEmployeeColumn,
 } from '../data/employees';
+import { getErrorPageMessage } from '../errors/get-error-page-message';
 
 export default function EmployeeListPage() {
   const [query, setQuery] = useState('');
   const [field, setField] = useState<keyof Employee>(defaultSearchField);
-  const { data: allEmployees, isError, isPending } = useEmployees();
+  const { data: allEmployees = [], error, isError, isPending } = useEmployees();
   const column = getEmployeeColumn(field);
   const employees = useMemo(
     () => filterEmployees(allEmployees, query, column),
     [allEmployees, column, query],
   );
+
+  if (isError) {
+    return <ErrorPage message={getErrorPageMessage(error)} />;
+  }
 
   return (
     <Box>
@@ -72,10 +77,7 @@ export default function EmployeeListPage() {
         {isPending ? (
           <CircularProgress aria-label="Loading employees" />
         ) : (
-          <>
-            {isError ? <Alert severity="error">Failed to load employees</Alert> : null}
-            <EmployeeTable employees={employees} />
-          </>
+          <EmployeeTable employees={employees} />
         )}
       </Stack>
     </Box>

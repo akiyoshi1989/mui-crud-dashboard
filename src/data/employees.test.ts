@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { EmployeeApiError, employeeApiErrorCodes } from './employee-api-error';
 import {
   createEmployee,
   employeeColumns,
@@ -18,6 +19,14 @@ import {
 } from './employees';
 
 describe('getEmployees', () => {
+  it('API 失敗はコード付きエラーにする', async () => {
+    vi.stubGlobal('fetch', async () => new Response('error', { status: 500 }));
+
+    await expect(getEmployees()).rejects.toMatchObject({
+      code: employeeApiErrorCodes.loadEmployees,
+    });
+  });
+
   it('API からモック従業員を返す', async () => {
     const employees = await getEmployees();
 
@@ -255,9 +264,10 @@ describe('createEmployee', () => {
   });
 
   it('不正な入力では追加しない', async () => {
-    await expect(createEmployee(emptyEmployeeFormValues)).rejects.toThrow(
-      'Employee form is invalid',
-    );
+    await expect(createEmployee(emptyEmployeeFormValues)).rejects.toBeInstanceOf(EmployeeApiError);
+    await expect(createEmployee(emptyEmployeeFormValues)).rejects.toMatchObject({
+      code: employeeApiErrorCodes.invalidEmployeeForm,
+    });
     expect(await getEmployees()).toHaveLength(3);
   });
 });

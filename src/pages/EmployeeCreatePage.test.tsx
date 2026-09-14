@@ -3,7 +3,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
+import { employeeApiErrorCodes } from '../data/employee-api-error';
 import { getEmployeeFormColumns } from '../data/employees';
+import { errorPageMessages } from '../errors/get-error-page-message';
 import { routes } from '../routes';
 import { mockEmployeesApi } from '../test/employees-api-mock';
 import { QueryProvider } from '../test/query-provider';
@@ -75,7 +77,42 @@ describe('EmployeeCreatePage', () => {
     await user.click(screen.getByRole('option', { name: 'Development' }));
     await user.click(screen.getByRole('button', { name: 'Create' }));
 
-    expect(await screen.findByText('Failed to create employee')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Create' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', {
+        name: errorPageMessages[employeeApiErrorCodes.createEmployee],
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'トップ画面へ戻る' })).toHaveAttribute('href', '/');
+    expect(screen.queryByRole('heading', { name: 'Create' })).not.toBeInTheDocument();
+  });
+
+  it('作成失敗からトップ画面へ戻れる', async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal('fetch', async (input: RequestInfo | URL, init?: RequestInit) => {
+      if ((init?.method ?? 'GET').toUpperCase() === 'POST') {
+        return new Response('error', { status: 500 });
+      }
+
+      return mockEmployeesApi(input, init);
+    });
+    renderCreatePage();
+
+    await user.type(screen.getByLabelText('Name'), 'Ada Lovelace');
+    await user.type(screen.getByLabelText('Age'), '36');
+    await user.type(screen.getByLabelText('Join date'), '2026-01-15');
+    await user.click(screen.getByRole('combobox', { name: 'Department' }));
+    await user.click(screen.getByRole('option', { name: 'Development' }));
+    await user.click(screen.getByRole('button', { name: 'Create' }));
+
+    expect(
+      await screen.findByRole('heading', {
+        name: errorPageMessages[employeeApiErrorCodes.createEmployee],
+      }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('link', { name: 'トップ画面へ戻る' }));
+
+    expect(await screen.findByRole('heading', { name: 'Employees' })).toBeInTheDocument();
+    expect(await screen.findByRole('cell', { name: 'Edward Perry' })).toBeInTheDocument();
   });
 });

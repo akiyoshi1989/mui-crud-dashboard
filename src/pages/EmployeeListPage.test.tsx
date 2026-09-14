@@ -4,7 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
 import { appPaths } from '../app-paths';
+import { employeeApiErrorCodes } from '../data/employee-api-error';
 import { employeeColumns, employeeSeed } from '../data/employees';
+import { errorPageMessages } from '../errors/get-error-page-message';
 import { QueryProvider } from '../test/query-provider';
 import { theme } from '../theme';
 import EmployeeListPage from './EmployeeListPage';
@@ -51,11 +53,17 @@ describe('EmployeeListPage', () => {
     expect(screen.getByRole('progressbar', { name: 'Loading employees' })).toBeInTheDocument();
   });
 
-  it('取得失敗時はエラーを表示する', async () => {
+  it('取得失敗時はエラーコンポーネントを表示する', async () => {
     vi.stubGlobal('fetch', async () => new Response('error', { status: 500 }));
     renderPage();
 
-    expect(await screen.findByText('Failed to load employees')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', {
+        name: errorPageMessages[employeeApiErrorCodes.loadEmployees],
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'トップ画面へ戻る' })).toHaveAttribute('href', '/');
+    expect(screen.queryByRole('table', { name: 'Employees' })).not.toBeInTheDocument();
   });
 
   it('Column の選択肢は表示列と一致する', async () => {

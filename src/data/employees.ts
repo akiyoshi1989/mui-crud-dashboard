@@ -1,5 +1,10 @@
 import { z } from 'zod';
 import dbJson from './db.json';
+import {
+  EmployeeApiError,
+  type EmployeeApiErrorCode,
+  employeeApiErrorCodes,
+} from './employee-api-error';
 
 export const employeeRoleSchema = z.enum(['Market', 'Finance', 'Development']);
 
@@ -95,22 +100,33 @@ export function toEmployeePayload(
   };
 }
 
-async function parseEmployeeResponse(response: Response, failedMessage: string): Promise<Employee> {
+async function parseEmployeeResponse(
+  response: Response,
+  code: EmployeeApiErrorCode,
+): Promise<Employee> {
   if (!response.ok) {
-    throw new Error(failedMessage);
+    throw new EmployeeApiError(code);
   }
 
   return (await response.json()) as Employee;
 }
 
 export async function getEmployees(): Promise<Employee[]> {
-  const response = await fetch(employeesApiPath);
+  try {
+    const response = await fetch(employeesApiPath);
 
-  if (!response.ok) {
-    throw new Error('Failed to load employees');
+    if (!response.ok) {
+      throw new EmployeeApiError(employeeApiErrorCodes.loadEmployees);
+    }
+
+    return (await response.json()) as Employee[];
+  } catch (error) {
+    if (error instanceof EmployeeApiError) {
+      throw error;
+    }
+
+    throw new EmployeeApiError(employeeApiErrorCodes.loadEmployees);
   }
-
-  return (await response.json()) as Employee[];
 }
 
 export function formatJoinDate(isoDate: string): string {
@@ -184,14 +200,22 @@ export async function createEmployee(values: EmployeeFormValues): Promise<Employ
   const parsed = employeeFormSchema.safeParse(values);
 
   if (!parsed.success) {
-    throw new Error('Employee form is invalid');
+    throw new EmployeeApiError(employeeApiErrorCodes.invalidEmployeeForm);
   }
 
-  const response = await fetch(employeesApiPath, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(toEmployeePayload(parsed.data)),
-  });
+  try {
+    const response = await fetch(employeesApiPath, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(toEmployeePayload(parsed.data)),
+    });
 
-  return parseEmployeeResponse(response, 'Failed to create employee');
+    return await parseEmployeeResponse(response, employeeApiErrorCodes.createEmployee);
+  } catch (error) {
+    if (error instanceof EmployeeApiError) {
+      throw error;
+    }
+
+    throw new EmployeeApiError(employeeApiErrorCodes.createEmployee);
+  }
 }
