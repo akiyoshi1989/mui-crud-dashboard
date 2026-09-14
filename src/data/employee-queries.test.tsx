@@ -5,9 +5,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { createQueryClient } from '../query-client';
 import { employeeApiErrorCodes } from './employee-api-error';
 import {
+  employeeQuery,
   employeesQuery,
   useCreateEmployee,
   useDeleteEmployee,
+  useEmployee,
   useEmployees,
 } from './employee-queries';
 import { employeeSeed, getEmployees } from './employees';
@@ -26,6 +28,43 @@ describe('employeesQuery', () => {
   it('query key と query fn をセットで持つ', () => {
     expect(employeesQuery.queryKey).toEqual(['employees']);
     expect(employeesQuery.queryFn).toBe(getEmployees);
+  });
+});
+
+describe('employeeQuery', () => {
+  it('query key と query fn をセットで持つ', () => {
+    const query = employeeQuery(1);
+
+    expect(query.queryKey).toEqual(['employees', 1]);
+    expect(query.queryFn).toBeTypeOf('function');
+  });
+});
+
+describe('useEmployee', () => {
+  it('API から従業員 1 件を取得する', async () => {
+    const { Wrapper } = createWrapper();
+    const { result } = renderHook(() => useEmployee(1), { wrapper: Wrapper });
+
+    await waitFor(() => expect(result.current.data?.name).toBe('Edward Perry'));
+
+    const { data } = result.current;
+    expect(data).toMatchObject({
+      id: 1,
+      birthDate: '2000-03-12T00:00:00.000Z',
+    });
+  });
+
+  it('取得失敗を error にする', async () => {
+    vi.stubGlobal('fetch', async () => new Response('error', { status: 500 }));
+
+    const { Wrapper } = createWrapper();
+    const { result } = renderHook(() => useEmployee(1), { wrapper: Wrapper });
+
+    await waitFor(() => {
+      const { error, isError } = result.current;
+      expect(isError).toBe(true);
+      expect(error).toMatchObject({ code: employeeApiErrorCodes.loadEmployee });
+    });
   });
 });
 

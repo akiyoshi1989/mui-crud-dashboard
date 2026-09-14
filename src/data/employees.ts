@@ -17,6 +17,7 @@ export type Employee = {
   joinDate: string;
   role: EmployeeRole;
   isFullTime: boolean;
+  birthDate?: string;
 };
 
 export type EmployeeColumnType = 'text' | 'date' | 'boolean';
@@ -74,6 +75,11 @@ export const employeeColumns: EmployeeColumn[] = [
   { field: 'isFullTime', header: 'Full-time', type: 'boolean' },
 ];
 
+export const employeeDetailColumns: EmployeeColumn[] = [
+  ...employeeColumns,
+  { field: 'birthDate', header: 'Date of birth', type: 'date' },
+];
+
 export const defaultSearchField: keyof Employee = 'name';
 
 export const emptyEmployeeFormValues: EmployeeFormValues = employeeFormDataSchema.parse({});
@@ -115,6 +121,20 @@ async function parseEmployeeResponse(
   return (await response.json()) as Employee;
 }
 
+export async function getEmployee(employeeId: number): Promise<Employee> {
+  try {
+    const response = await fetch(employeeApiPath(employeeId));
+
+    return await parseEmployeeResponse(response, employeeApiErrorCodes.loadEmployee);
+  } catch (error) {
+    if (error instanceof EmployeeApiError) {
+      throw error;
+    }
+
+    throw new EmployeeApiError(employeeApiErrorCodes.loadEmployee);
+  }
+}
+
 export async function getEmployees(): Promise<Employee[]> {
   try {
     const response = await fetch(employeesApiPath);
@@ -143,6 +163,10 @@ export function formatFullTime(isFullTime: boolean): string {
 
 export function formatEmployeeValue(employee: Employee, column: EmployeeColumn): string {
   const value = employee[column.field];
+
+  if (value === undefined) {
+    return '';
+  }
 
   if (column.type === 'date' && typeof value === 'string') {
     return formatJoinDate(value);
