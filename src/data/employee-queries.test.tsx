@@ -4,7 +4,12 @@ import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { createQueryClient } from '../query-client';
 import { employeeApiErrorCodes } from './employee-api-error';
-import { employeesQuery, useCreateEmployee, useEmployees } from './employee-queries';
+import {
+  employeesQuery,
+  useCreateEmployee,
+  useDeleteEmployee,
+  useEmployees,
+} from './employee-queries';
 import { employeeSeed, getEmployees } from './employees';
 
 function createWrapper() {
@@ -78,5 +83,26 @@ describe('useCreateEmployee', () => {
 
     const { data } = list.current;
     expect(data.at(-1)).toMatchObject({ name: 'Ada Lovelace' });
+  });
+});
+
+describe('useDeleteEmployee', () => {
+  it('削除後に一覧キャッシュを無効化する', async () => {
+    const { queryClient, Wrapper } = createWrapper();
+    const { result: list } = renderHook(() => useEmployees(), { wrapper: Wrapper });
+
+    await waitFor(() => expect(list.current.data).toHaveLength(3));
+
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    const { result: remove } = renderHook(() => useDeleteEmployee(), { wrapper: Wrapper });
+    const { mutate } = remove.current;
+
+    mutate(1);
+
+    await waitFor(() => expect(invalidateSpy).toHaveBeenCalledWith(employeesQuery));
+    await waitFor(() => expect(list.current.data).toHaveLength(2));
+
+    const { data } = list.current;
+    expect(data.map((employee) => employee.id)).toEqual([2, 3]);
   });
 });

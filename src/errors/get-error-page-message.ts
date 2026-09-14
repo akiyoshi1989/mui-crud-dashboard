@@ -7,6 +7,7 @@ import {
 export const errorPageMessages = {
   [employeeApiErrorCodes.loadEmployees]: '従業員一覧を取得できませんでした',
   [employeeApiErrorCodes.createEmployee]: '従業員を追加できませんでした',
+  [employeeApiErrorCodes.deleteEmployee]: '従業員を削除できませんでした',
 } as const;
 
 export const fallbackErrorPageMessage = '処理に失敗しました';
@@ -44,6 +45,10 @@ export function getErrorPageMessage(error: unknown): string {
 
   if (code === employeeApiErrorCodes.createEmployee) {
     return errorPageMessages[employeeApiErrorCodes.createEmployee];
+  }
+
+  if (code === employeeApiErrorCodes.deleteEmployee) {
+    return errorPageMessages[employeeApiErrorCodes.deleteEmployee];
   }
 
   return fallbackErrorPageMessage;

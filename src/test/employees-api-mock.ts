@@ -1,4 +1,4 @@
-import { type Employee, employeeSeed, employeesApiPath } from '../data/employees';
+import { type Employee, employeeApiPath, employeeSeed, employeesApiPath } from '../data/employees';
 
 function cloneSeed(): Employee[] {
   return structuredClone(employeeSeed);
@@ -46,6 +46,18 @@ export async function mockEmployeesApi(
     const created = { id: nextId, ...payload };
     employees = [...employees, created];
     return jsonResponse(created, 201);
+  }
+
+  const employeeId = Number(path.split('/').at(-1));
+  if (path === employeeApiPath(employeeId) && method === 'DELETE') {
+    const exists = employees.some((employee) => employee.id === employeeId);
+
+    if (!exists) {
+      return jsonResponse({ message: 'Not found' }, 404);
+    }
+
+    employees = employees.filter((employee) => employee.id !== employeeId);
+    return new Response(null, { status: 200 });
   }
 
   return jsonResponse({ message: 'Not found' }, 404);

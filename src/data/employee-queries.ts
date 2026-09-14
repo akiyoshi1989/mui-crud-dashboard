@@ -1,5 +1,5 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createEmployee, getEmployees } from './employees';
+import { createEmployee, deleteEmployee, getEmployees } from './employees';
 
 export const employeesQuery = queryOptions({
   queryKey: ['employees'] as const,
@@ -22,4 +22,16 @@ export function useCreateEmployee() {
   });
 
   return { mutate, isPending };
+}
+
+export function useDeleteEmployee() {
+  const queryClient = useQueryClient();
+  const { isPending, mutate, variables } = useMutation({
+    mutationFn: deleteEmployee,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(employeesQuery);
+    },
+  });
+
+  return { isPending, mutate, variables };
 }
