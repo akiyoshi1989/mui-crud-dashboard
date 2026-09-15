@@ -166,7 +166,7 @@ export default function EmployeeEditPage() {
 
   return (
     <Box>
-      <Box component="form" action={updateEmployeeAction}>
+      <Box component="form" key={employee.id} action={updateEmployeeAction}>
         <Stack spacing={3}>
           <Typography variant="h4" component="h1">
             {employee.name}

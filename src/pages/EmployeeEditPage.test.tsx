@@ -14,13 +14,15 @@ import { theme } from '../theme';
 function renderEditPage(path = '/employees/1/edit') {
   const router = createMemoryRouter(routes, { initialEntries: [path] });
 
-  return render(
+  render(
     <QueryProvider>
       <ThemeProvider theme={theme}>
         <RouterProvider router={router} />
       </ThemeProvider>
     </QueryProvider>,
   );
+
+  return { router };
 }
 
 describe('EmployeeEditPage', () => {
@@ -103,5 +105,23 @@ describe('EmployeeEditPage', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'トップ画面へ戻る' })).toHaveAttribute('href', '/');
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('同じルートで ID が変わると入力の初期値を付け替える', async () => {
+    const { router } = renderEditPage('/employees/1/edit');
+    const [, nextEmployee] = employeeSeed;
+
+    expect(await screen.findByRole('heading', { name: 'Edward Perry' })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Edward Perry');
+
+    await router.navigate('/employees/2/edit');
+
+    expect(await screen.findByRole('heading', { name: nextEmployee.name })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(nextEmployee.name);
+    expect(screen.getByRole('spinbutton', { name: 'Age' })).toHaveValue(nextEmployee.age);
+    expect(screen.getByRole('combobox', { name: 'Department' })).toHaveTextContent(
+      nextEmployee.role,
+    );
+    expect(screen.getByRole('checkbox', { name: 'Full-time' })).not.toBeChecked();
   });
 });

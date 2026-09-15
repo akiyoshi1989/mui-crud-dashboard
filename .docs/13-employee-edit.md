@@ -56,6 +56,7 @@
 - Full-time はチェックボックス
 - 送信は `Save`
 - 送信値は `FormData` から読み取る（`FormEvent` は使わない）
+- 同じルートで `employeeId` だけ変わったときは `form` を `employee.id` で付け替え、`defaultValue` を残さない
 - FormData の型付けと項目エラーは Zod スキーマで行う
 - 未入力・不正値は項目ごとにエラーを出す
 - 更新成功後は `/#/employees` の一覧へ戻り、更新した行が見える
