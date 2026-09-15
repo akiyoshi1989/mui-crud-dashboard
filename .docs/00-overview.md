@@ -30,7 +30,7 @@
 | 10 | 従業員削除 | [10-employee-delete.md](./10-employee-delete.md) |
 | 11 | 従業員削除の確認 | [11-employee-delete-confirm.md](./11-employee-delete-confirm.md) |
 | 12 | 従業員詳細 | [12-employee-detail.md](./12-employee-detail.md) |
-| 13 以降 | 編集 | 未作成。別ブランチで進める |
+| 13 | 従業員更新 | [13-employee-edit.md](./13-employee-edit.md) |
 
 ## 次の段階
 

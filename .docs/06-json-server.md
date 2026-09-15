@@ -8,7 +8,6 @@
 
 - 認証
 - ページネーション API
-- 編集 API の画面接続（エンドポイント自体は JSON Server が提供する）
 - concurrently などの同時起動用ライブラリ追加
 
 ## 構成
@@ -17,7 +16,7 @@
 - リソース名は `employees`
 - JSON Server は `http://localhost:3001`
 - Vite は `/api` を JSON Server へプロキシする
-- アプリは `GET /api/employees` と `GET /api/employees/:id` と `POST /api/employees` と `DELETE /api/employees/:id` を使う
+- アプリは `GET /api/employees` と `GET /api/employees/:id` と `POST /api/employees` と `PUT /api/employees/:id` と `DELETE /api/employees/:id` を使う
 - `id` は JSON Server が採番する
 
 ## 起動
@@ -29,5 +28,6 @@
 
 - 一覧は API から取得した従業員を表示する
 - 追加は API へ POST し、成功後に一覧へ戻る
+- 更新は API へ PUT し、成功後に一覧へ戻る
 - UT は JSON Server を起動せず、`fetch` モックで通る
 - `npm run lint` / `npm run test` / `npm run build` が成功する
