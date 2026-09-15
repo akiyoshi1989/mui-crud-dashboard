@@ -9,7 +9,7 @@ import {
   deleteConfirmLabel,
   deleteConfirmTitle,
 } from '../components/EmployeeDeleteConfirmDialog';
-import { deleteEmployeeLabel } from '../components/EmployeeTable';
+import { deleteEmployeeLabel, editEmployeeLabel } from '../components/EmployeeTable';
 import { employeeApiErrorCodes } from '../data/employee-api-error';
 import { employeeColumns, employeeSeed } from '../data/employees';
 import { errorPageMessages } from '../errors/get-error-page-message';
@@ -50,7 +50,9 @@ describe('EmployeeListPage', () => {
     }
 
     expect(screen.queryByRole('button', { name: 'Reload' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: editEmployeeLabel(employeeSeed[0].name) }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: deleteEmployeeLabel(employeeSeed[0].name) }),
     ).toBeInTheDocument();

@@ -104,6 +104,16 @@ export function getEmployeeFormColumns(): EmployeeColumn[] {
   return employeeColumns.filter((column) => column.field !== 'id');
 }
 
+export function isEmployeeFormColumn(column: EmployeeColumn): boolean {
+  return getEmployeeFormColumns().some((formColumn) => formColumn.field === column.field);
+}
+
+export type UpdateEmployeeInput = {
+  employeeId: number;
+  values: EmployeeFormValues;
+  birthDate?: string;
+};
+
 export function getEmployeeColumn(field: keyof Employee): EmployeeColumn {
   return employeeColumns.find((column) => column.field === field) ?? employeeColumns[0];
 }
@@ -259,6 +269,38 @@ export async function createEmployee(values: EmployeeFormValues): Promise<Employ
     }
 
     throw new EmployeeApiError(employeeApiErrorCodes.createEmployee);
+  }
+}
+
+export async function updateEmployee({
+  birthDate,
+  employeeId,
+  values,
+}: UpdateEmployeeInput): Promise<Employee> {
+  const parsed = employeeFormSchema.safeParse(values);
+
+  if (!parsed.success) {
+    throw new EmployeeApiError(employeeApiErrorCodes.invalidEmployeeForm);
+  }
+
+  try {
+    const response = await fetch(employeeApiPath(employeeId), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: employeeId,
+        ...toEmployeePayload(parsed.data),
+        ...(birthDate === undefined ? {} : { birthDate }),
+      }),
+    });
+
+    return await parseEmployeeResponse(response, employeeApiErrorCodes.updateEmployee);
+  } catch (error) {
+    if (error instanceof EmployeeApiError) {
+      throw error;
+    }
+
+    throw new EmployeeApiError(employeeApiErrorCodes.updateEmployee);
   }
 }
 

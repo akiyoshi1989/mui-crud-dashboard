@@ -18,6 +18,9 @@ describe('getErrorPageMessage', () => {
     expect(getErrorPageMessage(new EmployeeApiError(employeeApiErrorCodes.createEmployee))).toBe(
       errorPageMessages[employeeApiErrorCodes.createEmployee],
     );
+    expect(getErrorPageMessage(new EmployeeApiError(employeeApiErrorCodes.updateEmployee))).toBe(
+      errorPageMessages[employeeApiErrorCodes.updateEmployee],
+    );
     expect(getErrorPageMessage(new EmployeeApiError(employeeApiErrorCodes.deleteEmployee))).toBe(
       errorPageMessages[employeeApiErrorCodes.deleteEmployee],
     );

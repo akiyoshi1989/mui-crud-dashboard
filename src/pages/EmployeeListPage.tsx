@@ -94,6 +94,9 @@ export default function EmployeeListPage() {
             employees={employees}
             deletingId={isDeleting ? deletingId : undefined}
             onDelete={setEmployeeToDelete}
+            onEdit={(employee) => {
+              navigate(appPaths.employeeEdit(String(employee.id)));
+            }}
             onRowClick={(employee) => {
               navigate(appPaths.employee(String(employee.id)));
             }}

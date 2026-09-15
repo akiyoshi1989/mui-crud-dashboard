@@ -70,5 +70,18 @@ export async function mockEmployeesApi(
     return new Response(null, { status: 200 });
   }
 
+  if (path === employeeApiPath(employeeId) && method === 'PUT') {
+    const index = employees.findIndex((employee) => employee.id === employeeId);
+
+    if (index === -1) {
+      return jsonResponse({ message: 'Not found' }, 404);
+    }
+
+    const payload = JSON.parse(String(init?.body ?? '{}')) as Employee;
+    const updated = { ...employees[index], ...payload, id: employeeId };
+    employees = employees.map((employee) => (employee.id === employeeId ? updated : employee));
+    return jsonResponse(updated);
+  }
+
   return jsonResponse({ message: 'Not found' }, 404);
 }

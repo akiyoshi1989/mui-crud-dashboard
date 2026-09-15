@@ -17,8 +17,10 @@ import {
   getEmployeeColumn,
   getEmployeeFormColumns,
   getEmployees,
+  isEmployeeFormColumn,
   parseEmployeeId,
   toEmployeePayload,
+  updateEmployee,
   validateEmployeeForm,
 } from './employees';
 
@@ -208,6 +210,21 @@ describe('getEmployeeFormColumns', () => {
   });
 });
 
+describe('isEmployeeFormColumn', () => {
+  it('id と生年月日以外をフォーム項目にする', () => {
+    expect(isEmployeeFormColumn(getEmployeeColumn('name'))).toBe(true);
+    expect(isEmployeeFormColumn(getEmployeeColumn('id'))).toBe(false);
+
+    const birthDateColumn = employeeDetailColumns.find((column) => column.field === 'birthDate');
+
+    if (!birthDateColumn) {
+      throw new Error('birthDate 列がない');
+    }
+
+    expect(isEmployeeFormColumn(birthDateColumn)).toBe(false);
+  });
+});
+
 describe('validateEmployeeForm', () => {
   it('必須項目が空ならエラーを返す', () => {
     expect(validateEmployeeForm(emptyEmployeeFormValues)).toEqual({
@@ -345,6 +362,61 @@ describe('deleteEmployee', () => {
 
     await expect(deleteEmployee(1)).rejects.toMatchObject({
       code: employeeApiErrorCodes.deleteEmployee,
+    });
+  });
+});
+
+describe('updateEmployee', () => {
+  it('API へ PUT して従業員を更新する', async () => {
+    const updated = await updateEmployee({
+      employeeId: 1,
+      birthDate: '2000-03-12T00:00:00.000Z',
+      values: {
+        name: 'Ada Lovelace',
+        age: '36',
+        joinDate: '2026-01-15',
+        role: 'Development',
+        isFullTime: false,
+      },
+    });
+
+    expect(updated).toMatchObject({
+      id: 1,
+      name: 'Ada Lovelace',
+      age: 36,
+      joinDate: '2026-01-15T00:00:00.000Z',
+      role: 'Development',
+      isFullTime: false,
+      birthDate: '2000-03-12T00:00:00.000Z',
+    });
+    expect(await getEmployee(1)).toMatchObject({ name: 'Ada Lovelace' });
+  });
+
+  it('不正な入力では更新しない', async () => {
+    await expect(
+      updateEmployee({ employeeId: 1, values: emptyEmployeeFormValues }),
+    ).rejects.toMatchObject({
+      code: employeeApiErrorCodes.invalidEmployeeForm,
+    });
+    expect(await getEmployee(1)).toMatchObject({ name: 'Edward Perry' });
+  });
+
+  it('API 失敗はコード付きエラーにする', async () => {
+    vi.stubGlobal('fetch', async () => new Response('error', { status: 500 }));
+
+    await expect(
+      updateEmployee({
+        employeeId: 1,
+        values: {
+          name: 'Ada Lovelace',
+          age: '36',
+          joinDate: '2026-01-15',
+          role: 'Development',
+          isFullTime: true,
+        },
+      }),
+    ).rejects.toMatchObject({
+      code: employeeApiErrorCodes.updateEmployee,
     });
   });
 });
