@@ -5,7 +5,13 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { createEmployee, deleteEmployee, getEmployee, getEmployees } from './employees';
+import {
+  createEmployee,
+  deleteEmployee,
+  getEmployee,
+  getEmployees,
+  updateEmployee,
+} from './employees';
 
 export const employeesQuery = queryOptions({
   queryKey: ['employees'] as const,
@@ -44,6 +50,19 @@ export function useCreateEmployee() {
   });
 
   return { mutate, isPending };
+}
+
+export function useUpdateEmployee() {
+  const queryClient = useQueryClient();
+  const { isPending, mutate } = useMutation({
+    mutationFn: updateEmployee,
+    onSuccess: async (_employee, { employeeId }) => {
+      await queryClient.invalidateQueries(employeesQuery);
+      await queryClient.invalidateQueries({ queryKey: employeeQuery(employeeId).queryKey });
+    },
+  });
+
+  return { isPending, mutate };
 }
 
 export function useDeleteEmployee() {

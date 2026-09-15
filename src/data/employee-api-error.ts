@@ -2,6 +2,7 @@ export const employeeApiErrorCodes = {
   loadEmployees: 'load-employees',
   loadEmployee: 'load-employee',
   createEmployee: 'create-employee',
+  updateEmployee: 'update-employee',
   deleteEmployee: 'delete-employee',
   invalidEmployeeForm: 'invalid-employee-form',
 } as const;

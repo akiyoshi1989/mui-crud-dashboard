@@ -11,6 +11,7 @@ import {
   useDeleteEmployee,
   useEmployee,
   useEmployees,
+  useUpdateEmployee,
 } from './employee-queries';
 import { employeeSeed, getEmployees } from './employees';
 
@@ -153,5 +154,39 @@ describe('useDeleteEmployee', () => {
 
     const { data } = list.current;
     expect(data.map((employee) => employee.id)).toEqual([2, 3]);
+  });
+});
+
+describe('useUpdateEmployee', () => {
+  it('更新後に一覧と詳細キャッシュを無効化する', async () => {
+    const { queryClient, Wrapper } = createWrapper();
+    const { result: list } = renderHook(() => useEmployees(), { wrapper: Wrapper });
+    const { result: detail } = renderHook(() => useEmployee(1), { wrapper: Wrapper });
+
+    await waitFor(() => expect(list.current.data).toHaveLength(3));
+    await waitFor(() => expect(detail.current.data?.name).toBe('Edward Perry'));
+
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    const { result: update } = renderHook(() => useUpdateEmployee(), { wrapper: Wrapper });
+    const { mutate } = update.current;
+
+    mutate({
+      employeeId: 1,
+      birthDate: '2000-03-12T00:00:00.000Z',
+      values: {
+        name: 'Ada Lovelace',
+        age: '36',
+        joinDate: '2026-01-15',
+        role: 'Development',
+        isFullTime: false,
+      },
+    });
+
+    await waitFor(() => expect(invalidateSpy).toHaveBeenCalledWith(employeesQuery));
+    await waitFor(() =>
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: employeeQuery(1).queryKey }),
+    );
+    await waitFor(() => expect(list.current.data?.[0]).toMatchObject({ name: 'Ada Lovelace' }));
+    await waitFor(() => expect(detail.current.data).toMatchObject({ name: 'Ada Lovelace' }));
   });
 });

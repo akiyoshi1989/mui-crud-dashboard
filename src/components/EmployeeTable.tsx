@@ -1,4 +1,5 @@
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import {
   IconButton,
   Paper,
@@ -21,6 +22,7 @@ type EmployeeTableProps = {
   columns?: EmployeeColumn[];
   deletingId?: number;
   onDelete?: (employee: Employee) => void;
+  onEdit?: (employee: Employee) => void;
   onRowClick?: (employee: Employee) => void;
 };
 
@@ -28,14 +30,19 @@ export function deleteEmployeeLabel(name: string): string {
   return `Delete ${name}`;
 }
 
+export function editEmployeeLabel(name: string): string {
+  return `Edit ${name}`;
+}
+
 export default function EmployeeTable({
   employees,
   columns = employeeColumns,
   deletingId,
   onDelete,
+  onEdit,
   onRowClick,
 }: EmployeeTableProps) {
-  const showActions = Boolean(onDelete);
+  const showActions = Boolean(onDelete || onEdit);
 
   return (
     <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
@@ -70,14 +77,26 @@ export default function EmployeeTable({
                     event.stopPropagation();
                   }}
                 >
-                  <IconButton
-                    aria-label={deleteEmployeeLabel(employee.name)}
-                    disabled={deletingId === employee.id}
-                    onClick={() => onDelete?.(employee)}
-                    size="small"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  {onEdit ? (
+                    <IconButton
+                      aria-label={editEmployeeLabel(employee.name)}
+                      disabled={deletingId === employee.id}
+                      onClick={() => onEdit(employee)}
+                      size="small"
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  ) : null}
+                  {onDelete ? (
+                    <IconButton
+                      aria-label={deleteEmployeeLabel(employee.name)}
+                      disabled={deletingId === employee.id}
+                      onClick={() => onDelete(employee)}
+                      size="small"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  ) : null}
                 </TableCell>
               ) : null}
             </TableRow>
